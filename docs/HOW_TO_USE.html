@@ -42,7 +42,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 14 November 2026<br>Up to SM-005</div>
+  <div class="meta">Updated 14 November 2026<br>Up to SM-006</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
@@ -100,11 +100,20 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <tr><td><code>App</code></td><td>Your running copy of the app (the approved version). This guide and the plan are in <code>App\docs</code>.</td><td>Yes (code only)</td></tr>
 <tr><td><code>Dev</code></td><td>Claude's working copy for new changes. It never posts for real.</td><td>Yes (code only)</td></tr>
 <tr><td><code>Data</code></td><td>Your settings file, database, photos and videos. The app's private key is in the settings file.</td><td><b>Never</b></td></tr>
-<tr><td><code>Backups</code></td><td>Daily encrypted copies of <code>Data</code> (from SM-006). You copy this folder to your USB drive about once a week.</td><td><b>Never</b></td></tr>
+<tr><td><code>Backups</code></td><td>Daily encrypted copies of <code>Data</code>. You copy this folder to your USB drive about once a week.</td><td><b>Never</b></td></tr>
 <tr><td><code>Tracker</code></td><td>Local copy of the <a href="https://claude.ai/artifact/Vq8Q6jpWRxQ645PNxv7PDp">online tracker</a>.</td><td>No</td></tr>
 <tr><td><code>Metricool_Export_2026-11-14</code></td><td>Your Metricool history, saved before the trial ended.</td><td>No</td></tr>
 </tbody></table></div>
 <div class="note"><b>Do not delete or move the Data folder.</b> It holds everything the app knows. The App copy finds it through a small hidden file called <code>.data-dir</code>.</div>
+
+<h2>Backups</h2>
+<ol>
+<li><b>First time:</b> open <b>Backups</b> (left menu) &rarr; <b>Set backup password</b>. Use at least 12 characters and type it twice. <b>Write it down and keep it away from the laptop</b>: without it nobody can open the backups, not even Claude.</li>
+<li><b>Every day</b> (when the laptop is on) the app saves a locked copy of everything into the <code>Backups</code> folder by itself. The newest 14 are kept. You can also press <b>Back up now</b>.</li>
+<li><b>About once a week:</b> plug in your USB drive, copy the whole <code>D:\Pravin\Moggi\SocialMedia_Manager\Backups</code> folder onto it, then press <b>I copied Backups to my USB drive today</b>. The app reminds you after 7 days.</li>
+<li><b>To restore:</b> ask Claude. (By hand, a backup opens with the free 7-Zip and your password.)</li>
+</ol>
+<p>The dashboard's <b>Backups</b> card turns into a list of warnings when something needs you: no password yet, a failed backup, no backup for over a day, or the USB copy is due.</p>
 
 <h2>Check that the app is healthy</h2>
 <p>Open PowerShell in the App folder and run:</p>

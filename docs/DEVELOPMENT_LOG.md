@@ -4,6 +4,31 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-006 — Daily encrypted backups and the USB reminder (14 Nov 2026)
+
+**Tracker:** #25 (and #14: the USB copy is the owner's task).
+
+**What changed**
+- A **Backups** page (left menu) with three buttons: **Back up now**, **Set backup password**, and **I copied Backups to my USB drive today**. It shows the last backup, the folder, and plain warnings.
+- Once a day (checked every hour, so a laptop that was off at night still gets its backup later) the app saves a zip of the data folder: the database (a consistent copy, even while the app runs), the settings file with the app key, and all photos and videos. Every file in the zip is locked with **your backup password (AES-256)**. The newest 14 backups are kept; older ones are removed, and nothing else in the folder is ever touched.
+- You type the backup password in the app; it is stored encrypted and Claude never sees it. Without it nobody can open the backups.
+- A **Backups** card on the dashboard and the Backups page warn when: no password is set, the last backup failed, there has been no backup for 26 hours, or the USB copy has not been confirmed for 7 days.
+- `smm:doctor` warns when no backup password is set.
+
+**Why:** your data lives only on the laptop; the plan keeps daily encrypted copies there and a weekly copy on your USB drive.
+
+**Checks**
+- 53 tests pass, including: the zip holds the database, settings file and media, and a file cannot be read without the password; the backed-up database passes SQLite's integrity check; with 16 backups plus other files, only the 2 oldest backups are deleted; no password → clear message, nothing written; a backup 2 hours old → skipped; a successful run records the file name and clears the old error; the USB reminder is due when never confirmed or 7+ days ago; the password must be 12+ characters and typed twice the same.
+- Opened in Edge on the Dev copy: the dashboard shows the status and Backups cards; the Backups page shows the buttons and warnings with no script errors.
+
+**To do on App after merging:** set the backup password (you), then **Back up now** once and check a zip appears in `D:\Pravin\Moggi\SocialMedia_Manager\Backups`.
+
+**Commits:** see the branch `feat/sm-006-backups`; docs: this entry.
+
+**Where:** Dev — done. App — after the owner merges the branches in order (`feat/sm-002-panel` … `feat/sm-006-backups`).
+
+---
+
 ## SM-005 — Timed jobs, the status card, starting with Windows (14 Nov 2026)
 
 **Tracker:** #16.
