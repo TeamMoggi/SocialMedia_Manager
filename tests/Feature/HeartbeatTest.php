@@ -21,7 +21,7 @@ class HeartbeatTest extends TestCase
         $this->assertSame('2026-11-14T10:15:00+00:00', Setting::get('heartbeat_at'));
     }
 
-    public function test_schedule_runs_heartbeat_every_minute(): void
+    public function test_heartbeat_is_not_scheduled_every_minute(): void
     {
         // Read the schedule itself: schedule:list output carries colour codes between the fields.
         $events = array_values(array_filter(
@@ -29,14 +29,14 @@ class HeartbeatTest extends TestCase
             fn ($event) => str_contains((string) $event->command, 'smm:heartbeat'),
         ));
 
-        $this->assertCount(1, $events);
-        $this->assertSame('* * * * *', $events[0]->expression);
+        // The heartbeat now comes from the once-a-day jobs (smm:daily), not a job every minute.
+        $this->assertCount(0, $events);
     }
 
     public function test_doctor_warns_when_timed_jobs_have_not_run(): void
     {
         $this->artisan('smm:doctor')
-            ->expectsOutputToContain('WARN  Timed jobs have not run')
+            ->expectsOutputToContain('WARN  Daily jobs have not run')
             ->assertExitCode(0);
     }
 }

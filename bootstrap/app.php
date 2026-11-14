@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureLocalRequest;
+use App\Http\Middleware\RecordActivity;
 use App\Support\DataDir;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,6 +20,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Every request, the app's screens included: on the laptop only the laptop itself is answered.
         $middleware->prepend(EnsureLocalRequest::class);
+        // Keeps smm:serve from stopping the app while someone uses it.
+        $middleware->append(RecordActivity::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

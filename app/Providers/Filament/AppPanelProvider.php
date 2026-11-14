@@ -37,6 +37,8 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('brand/favicon.png'))
             ->colors(['primary' => Color::hex('#1b4c86')])
             ->databaseNotifications()
+            // No background polling: an open but unused tab must let the app stop after 30 minutes.
+            ->databaseNotificationsPolling(null)
             // Brands (Moggies International first): every screen works inside one brand, at /<brand-slug>.
             ->tenant(Brand::class, slugAttribute: 'slug')
             ->tenantRegistration(RegisterBrand::class)

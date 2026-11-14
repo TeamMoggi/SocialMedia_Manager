@@ -6,7 +6,7 @@ use App\Models\Setting;
 use Carbon\CarbonImmutable;
 
 /**
- * Are the timed jobs (Windows Task Scheduler → schedule:run every minute) running?
+ * Are the daily jobs (Windows task "\SocialMediaManager\Daily" → smm:daily) running?
  */
 final class SystemHealth
 {
@@ -40,10 +40,21 @@ final class SystemHealth
     {
         $age = $this->heartbeatAgeMinutes($now);
         if ($age === null) {
-            return 'Timed jobs have not run yet';
+            return 'Daily jobs have not run yet';
         }
-        $when = $age === 0 ? 'less than a minute ago' : ($age === 1 ? '1 minute ago' : "{$age} minutes ago");
 
-        return "Timed jobs ran {$when}";
+        return 'Daily jobs ran '.self::ago($age);
+    }
+
+    private static function ago(int $minutes): string
+    {
+        $plural = static fn (int $n, string $unit): string => $n === 1 ? "1 {$unit} ago" : "{$n} {$unit}s ago";
+
+        return match (true) {
+            $minutes < 1 => 'less than a minute ago',
+            $minutes < 60 => $plural($minutes, 'minute'),
+            $minutes < 48 * 60 => $plural(intdiv($minutes, 60), 'hour'),
+            default => $plural(intdiv($minutes, 24 * 60), 'day'),
+        };
     }
 }

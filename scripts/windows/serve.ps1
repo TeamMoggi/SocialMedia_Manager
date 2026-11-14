@@ -1,6 +1,6 @@
 <#
-  Runs the app's web server in the foreground (on 127.0.0.1 only) until it is stopped.
-  The Windows task "\SocialMediaManager\Server" runs this at start-up; start.ps1 runs it hidden otherwise.
+  Runs the app (on 127.0.0.1 only) until nobody has used it for 30 minutes: php artisan smm:serve.
+  start.ps1 runs this hidden; the desktop shortcut "SocialMedia Manager" calls start.ps1 -Open.
 #>
 param([string]$Php = '')
 $ErrorActionPreference = 'Stop'
@@ -13,12 +13,10 @@ if (Test-SmmPortBusy) {
 }
 
 $log = Join-Path $SmmData 'logs\server.log'
-if (Test-Path $log) { Move-Item $log "$log.old" -Force }
+if ((Test-Path $log) -and ((Get-Item $log).Length -gt 5MB)) { Move-Item $log "$log.old" -Force }
 
-# PHP's server must start inside the public folder, with Laravel's router given by full path.
 # Start-Process does the redirection: PowerShell 5.1 would turn PHP's stderr lines into errors.
-$router = Join-Path $SmmRepo 'vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php'
-$server = Start-Process -FilePath $php -ArgumentList @('-S', "127.0.0.1:$SmmPort", "`"$router`"") `
-    -WorkingDirectory (Join-Path $SmmRepo 'public') -NoNewWindow -Wait -PassThru `
-    -RedirectStandardError $log -RedirectStandardOutput (Join-Path $SmmData 'logs\server-out.log')
-exit $server.ExitCode
+$watch = Start-Process -FilePath $php -ArgumentList @('artisan', 'smm:serve', '--no-interaction') `
+    -WorkingDirectory $SmmRepo -NoNewWindow -Wait -PassThru `
+    -RedirectStandardOutput (Join-Path $SmmData 'logs\serve-last.log') -RedirectStandardError (Join-Path $SmmData 'logs\serve-last-error.log')
+exit $watch.ExitCode
