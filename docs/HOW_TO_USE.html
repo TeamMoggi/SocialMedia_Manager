@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SocialMedia Manager Guide</title>
+<link rel="icon" href="assets/moggies-international-icon.png">
+<style>
+:root{--bg:#f5f7fa;--surface:#fff;--text:#17212f;--muted:#566476;--line:#dbe2ea;--brand:#1b4c86;--brand-soft:#e7eff9;--ok:#0d7d61;--ok-soft:#e3f4ee;--warn:#a85208;--warn-soft:#fdf0e1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--surface:#172131;--text:#e5ebf2;--muted:#9daec2;--line:#2a3a50;--brand:#86b4ee;--brand-soft:#1b2b43;--ok:#52cfa6;--ok-soft:#16352c;--warn:#f0a25b;--warn-soft:#3a2a19}}
+:root[data-theme="dark"]{--bg:#0f1520;--surface:#172131;--text:#e5ebf2;--muted:#9daec2;--line:#2a3a50;--brand:#86b4ee;--brand-soft:#1b2b43;--ok:#52cfa6;--ok-soft:#16352c;--warn:#f0a25b;--warn-soft:#3a2a19}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI",system-ui,Arial,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 56px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.plate{background:#fff;border:1px solid #e3e8ee;border-radius:12px;padding:7px 9px;display:flex}
+.plate img{height:42px;width:auto;display:block}
+.name{font-weight:700;font-size:18px}.name small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.meta{margin-left:auto;font-size:13px;color:var(--muted);text-align:right}
+h1{font-size:26px;margin:26px 0 6px}
+h2{font-size:20px;margin:30px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--brand-soft)}
+h3{font-size:16px;margin:16px 0 6px}
+.lede{color:var(--muted);margin-top:0}
+code,pre{font-family:Consolas,ui-monospace,monospace;font-size:13px}
+code{background:var(--brand-soft);padding:1px 5px;border-radius:5px;word-break:break-word}
+pre{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;overflow-x:auto;line-height:1.5}
+.note{border-left:4px solid var(--brand);background:var(--brand-soft);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0}
+.note.ok{border-color:var(--ok);background:var(--ok-soft)}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--brand-soft)}tr:last-child td{border-bottom:none}
+a{color:var(--brand)}
+footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:600px){.meta{margin-left:0;text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
+  <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
+  <div class="meta">Updated 14 November 2026<br>Up to SM-001</div>
+</header>
+
+<h1>How to use SocialMedia Manager</h1>
+<p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
+
+<div class="note warn"><b>Where we are:</b> the foundation is being built. There are no screens to open yet; they come in the next step (SM-002). Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+
+<h2>Where everything lives</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Folder in <code>D:\Pravin\Moggi\SocialMedia_Manager</code></th><th>What it holds</th><th>In GitHub?</th></tr></thead>
+<tbody>
+<tr><td><code>App</code></td><td>Your running copy of the app (the approved version). This guide and the plan are in <code>App\docs</code>.</td><td>Yes (code only)</td></tr>
+<tr><td><code>Dev</code></td><td>Claude's working copy for new changes. It never posts for real.</td><td>Yes (code only)</td></tr>
+<tr><td><code>Data</code></td><td>Your settings file, database, photos and videos. The app's private key is in the settings file.</td><td><b>Never</b></td></tr>
+<tr><td><code>Backups</code></td><td>Daily encrypted copies of <code>Data</code> (from SM-006). You copy this folder to your USB drive about once a week.</td><td><b>Never</b></td></tr>
+<tr><td><code>Tracker</code></td><td>Local copy of the <a href="https://claude.ai/artifact/Vq8Q6jpWRxQ645PNxv7PDp">online tracker</a>.</td><td>No</td></tr>
+<tr><td><code>Metricool_Export_2026-11-14</code></td><td>Your Metricool history, saved before the trial ended.</td><td>No</td></tr>
+</tbody></table></div>
+<div class="note"><b>Do not delete or move the Data folder.</b> It holds everything the app knows. The App copy finds it through a small hidden file called <code>.data-dir</code>.</div>
+
+<h2>Check that the app is healthy</h2>
+<p>Open PowerShell in the App folder and run:</p>
+<pre>cd D:\Pravin\Moggi\SocialMedia_Manager\App
+php artisan smm:doctor</pre>
+<p>Every line should start with <b>OK</b>. On your App copy the last line reads <code>Publish mode: live</code>. A line starting with <b>FAIL</b> says what is wrong and how to fix it; send it to Claude if it is not clear.</p>
+
+<h2>For Claude: setting up a copy</h2>
+<p>Only needed once per copy, or on a new laptop after the code is downloaded from GitHub and <code>composer install</code> has run. It never replaces an existing app key.</p>
+<pre>powershell -ExecutionPolicy Bypass -File .\scripts\windows\setup.ps1 -DataDir D:\Pravin\Moggi\SocialMedia_Manager\Data -PublishMode live -BackupDir D:\Pravin\Moggi\SocialMedia_Manager\Backups</pre>
+<p>The tools it needs are PHP 8.5 (installed with winget) and Composer (<code>D:\Tools\ComposerSetup</code>). If a PHP upgrade ever resets PHP's settings, <code>smm:doctor</code> reports the missing extensions.</p>
+
+<footer>Moggies International &middot; SocialMedia Manager guide &middot; kept up to date with every step (see <code>docs\DEVELOPMENT_LOG.md</code>).</footer>
+</div>
+</body>
+</html>

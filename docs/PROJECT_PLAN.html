@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SocialMedia_Manager Project Plan</title>
+<link rel="icon" href="assets/moggies-international-icon.png">
+<style>
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --text:#17212f; --muted:#566476; --line:#dbe2ea;
+  --brand:#1b4c86; --brand-soft:#e7eff9; --accent:#0d7d61; --accent-soft:#e3f4ee;
+  --warn:#a85208; --warn-soft:#fdf0e1; --chip:#edf1f6; --shadow:0 1px 3px rgba(20,35,60,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1520; --surface:#172131; --text:#e5ebf2; --muted:#9daec2; --line:#2a3a50;
+    --brand:#86b4ee; --brand-soft:#1b2b43; --accent:#52cfa6; --accent-soft:#16352c;
+    --warn:#f0a25b; --warn-soft:#3a2a19; --chip:#22314a; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1520; --surface:#172131; --text:#e5ebf2; --muted:#9daec2; --line:#2a3a50;
+  --brand:#86b4ee; --brand-soft:#1b2b43; --accent:#52cfa6; --accent-soft:#16352c;
+  --warn:#f0a25b; --warn-soft:#3a2a19; --chip:#22314a; --shadow:none;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 16px 64px}
+header.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:18px 20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.plate{background:#fff;border-radius:12px;padding:8px 10px;display:flex;align-items:center;border:1px solid #e3e8ee}
+.plate img{height:46px;width:auto;display:block}
+.brandname{font-weight:700;font-size:18px;letter-spacing:.2px}
+.brandname small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.docmeta{margin-left:auto;text-align:right;font-size:13px;color:var(--muted)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--warn-soft);color:var(--warn)}
+h1{font-size:28px;line-height:1.25;margin:28px 0 6px}
+.lede{color:var(--muted);margin:0 0 18px;max-width:780px}
+nav.toc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:18px 0 8px;font-size:14px}
+nav.toc ol{margin:6px 0 0;padding-left:20px;columns:2;column-gap:28px}
+nav.toc a{color:var(--brand);text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+section{margin-top:34px}
+h2{font-size:21px;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--brand-soft)}
+h2 .num{color:var(--brand);margin-right:6px}
+h3{font-size:16px;margin:18px 0 6px}
+p{margin:8px 0}
+code{font-size:13px;background:var(--chip);padding:1px 5px;border-radius:5px;word-break:break-word}
+.muted{color:var(--muted)}
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.card h3{margin-top:0}
+.card .k{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600}
+.card.rec{border:2px solid var(--accent)}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--muted);margin-left:4px;vertical-align:1px}
+.tag.ok{background:var(--accent-soft);color:var(--accent)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.brand{background:var(--brand-soft);color:var(--brand)}
+ul.tight{margin:6px 0;padding-left:20px}
+ul.tight li{margin:3px 0}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
+th{background:var(--brand-soft);color:var(--text);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr.phase td{background:var(--chip);font-weight:700;color:var(--brand)}
+td.id{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.note{border-left:4px solid var(--brand);background:var(--brand-soft);padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0}
+.note.warn{border-color:var(--warn);background:var(--warn-soft)}
+.note.ok{border-color:var(--accent);background:var(--accent-soft)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.box b{display:block;color:var(--brand);margin-bottom:2px}
+.arch{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+.arch .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.arch .arrow{text-align:center;color:var(--muted);font-size:13px}
+.arch .app{border:2px solid var(--brand)}
+pre.tree{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.55;overflow-x:auto;margin:10px 0}
+ol.steps{padding-left:22px}
+ol.steps li{margin:6px 0}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+.q .why{color:var(--muted);font-size:13.5px;margin-top:4px}
+footer{margin-top:44px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+a{color:var(--brand)}
+@media (max-width:640px){
+  nav.toc ol{columns:1}
+  .docmeta{margin-left:0;text-align:left}
+  h1{font-size:23px}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:12px}
+  .card,.table-wrap,.q,header.top,nav.toc,pre.tree{box-shadow:none;break-inside:avoid}
+  nav.toc{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
+  <div class="brandname">Moggies International<small>SocialMedia_Manager &middot; project plan</small></div>
+  <div class="docmeta">Version 1.0 &middot; 14 November 2026<br><span class="tag ok">Approved by the owner, 14 Nov 2026</span></div>
+</header>
+
+<h1>SocialMedia_Manager: project plan</h1>
+<p class="lede">Our own app to plan, approve, publish and measure posts on <b>Instagram, Facebook and LinkedIn</b>, covering the parts of Metricool we use. It runs on your laptop first, keeps the code backed up on GitHub, and can move to Hostinger with a login later. It is built with Laravel, using the same working routine as moggies.in.</p>
+
+<div class="note ok"><b>What you decided (14 Nov 2026)</b>
+<ul class="tight">
+  <li><b>Why our own app:</b> cost, features and data security.</li>
+  <li><b>Local first:</b> it runs and is managed from your laptop, and GitHub keeps the code as a backup. Hosting on Hostinger with a login comes later.</li>
+  <li><b>Build with Laravel</b> (PHP).</li>
+  <li><b>No login for now.</b></li>
+  <li><b>More accounts beyond Moggies</b> may be added later.</li>
+  <li><b>AI caption help and a Claude connector:</b> keep the option open.</li>
+  <li><b>Accounts:</b> the three connected in Metricool: Facebook Page, Instagram moggies_international, LinkedIn company page.</li>
+  <li><b>Tasks you asked for:</b> LinkedIn approving company-page access (#10) and audience breakdowns by country, city, age and gender (#30).</li>
+</ul></div>
+
+<nav class="toc" aria-label="Contents">
+<b>Contents</b>
+<ol>
+  <li><a href="#glance">At a glance</a></li>
+  <li><a href="#why">Why, and what success looks like</a></li>
+  <li><a href="#scope">What is in, what is out</a></li>
+  <li><a href="#metricool">Metricool features vs our app</a></li>
+  <li><a href="#approaches">How we build it</a></li>
+  <li><a href="#tools">Tools to install and use</a></li>
+  <li><a href="#folders">Folders on your laptop</a></li>
+  <li><a href="#architecture">How it fits together</a></li>
+  <li><a href="#networks">What each network allows</a></li>
+  <li><a href="#data">Data we keep</a></li>
+  <li><a href="#security">Security and privacy</a></li>
+  <li><a href="#routine">Working routine</a></li>
+  <li><a href="#phases">Phases and task list</a></li>
+  <li><a href="#timeline">Timeline and costs</a></li>
+  <li><a href="#risks">Risks</a></li>
+  <li><a href="#questions">Still needed from you</a></li>
+  <li><a href="#calls">Calls I made for you to check</a></li>
+  <li><a href="#sources">Sources</a></li>
+</ol>
+</nav>
+
+<!-- 1 -->
+<section id="glance">
+<h2><span class="num">1</span>At a glance</h2>
+<div class="grid g3">
+  <div class="card"><div class="k">What</div>An app on your laptop, opened in the browser, where posts are written once, approved, published on time and measured.</div>
+  <div class="card"><div class="k">Networks</div>Facebook Page, Instagram (moggies_international), LinkedIn company page. The personal LinkedIn profile is optional, for later.</div>
+  <div class="card"><div class="k">Who uses it</div>You, on this laptop, with no login screen. Claude builds it. A login comes when it moves online.</div>
+  <div class="card rec"><div class="k">Build</div>Laravel + Filament (PHP), with a single-file database. All tools are free and all go on the D: drive.</div>
+  <div class="card"><div class="k">Phases</div>0&nbsp;Set up &rarr; 1&nbsp;Build and first posts &rarr; 2&nbsp;Analytics &rarr; 3&nbsp;Engage and grow &rarr; 4&nbsp;Go online (when you decide).</div>
+  <div class="card"><div class="k">First milestone</div>Approved posts publish themselves on Facebook and Instagram, target 20 December 2026. LinkedIn follows when LinkedIn approves our access.</div>
+</div>
+</section>
+
+<!-- 2 -->
+<section id="why">
+<h2><span class="num">2</span>Why, and what success looks like</h2>
+<ul class="tight">
+  <li><b>Cost:</b> no monthly subscription. All tools are free; only the optional AI helper costs a little per use.</li>
+  <li><b>Features:</b> the parts of Metricool we use, plus what it doesn't give us: approval with your brand rules, history that never expires, and a link to Claude later.</li>
+  <li><b>Data security:</b> your posts, numbers and account access stay on your laptop and in your own encrypted backups, never in GitHub or a third-party tool.</li>
+</ul>
+<h3>Success measures <span class="tag brand">my proposal</span></h3>
+<ul class="tight">
+  <li>No post goes live without your approval.</li>
+  <li>Two weeks of scheduled posts with none missed while the laptop was on, and none more than 5 minutes late.</li>
+  <li>Planning a week of posts for three networks takes under 30 minutes.</li>
+  <li>Our numbers match Meta Business Suite and LinkedIn's page analytics within &plusmn;5% for the same period.</li>
+  <li>History kept from 3 Oct 2026 onwards, starting with the saved Metricool export.</li>
+  <li>Only official network APIs are used.</li>
+</ul>
+</section>
+
+<!-- 3 -->
+<section id="scope">
+<h2><span class="num">3</span>What is in, what is out</h2>
+<div class="grid g3">
+  <div class="card"><h3>Goals (in)</h3>
+    <ul class="tight">
+      <li>Brands, each with its own accounts (Moggies International first)</li>
+      <li>Connect the accounts securely</li>
+      <li>Write once, adjust per network, previews</li>
+      <li>Photo and video checks per network</li>
+      <li>Approval with your brand-rules checklist</li>
+      <li>Calendar, drag to move</li>
+      <li>On-time publishing, retries, alerts</li>
+      <li>Daily analytics history, dashboard, monthly report</li>
+      <li>Audience breakdowns (country, city, age, gender)</li>
+      <li>Best time to post, from your own numbers</li>
+      <li>Comments inbox (Phase 3)</li>
+    </ul></div>
+  <div class="card"><h3>Not now (non-goals)</h3>
+    <ul class="tight">
+      <li>Other networks (X, TikTok, YouTube, Pinterest, Threads, Google Business Profile)</li>
+      <li>Paid ads</li>
+      <li>Other businesses signing in themselves (needs Meta's review, Phase 4)</li>
+      <li>Web-wide listening, hashtag tracking, link-in-bio page</li>
+      <li>A phone app</li>
+      <li>Direct messages</li>
+    </ul></div>
+  <div class="card"><h3>Must never happen (anti-goals)</h3>
+    <ul class="tight">
+      <li>A post goes live without your approval</li>
+      <li>A missed post going out late without asking you</li>
+      <li>Unofficial tools or scraping that could get an account blocked</li>
+      <li>Your data or account access in GitHub</li>
+      <li>Losing analytics history</li>
+      <li>Slowing the laptop down (5.9 GB memory)</li>
+    </ul></div>
+</div>
+</section>
+
+<!-- 4 -->
+<section id="metricool">
+<h2><span class="num">4</span>Metricool features vs our app</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Metricool feature</th><th>In our app</th><th>Phase</th></tr></thead>
+<tbody>
+<tr><td>Planner and calendar</td><td><span class="tag ok">Yes</span></td><td>1</td></tr>
+<tr><td>Instagram feed posts, carousels, Reels</td><td><span class="tag ok">Yes</span></td><td>1</td></tr>
+<tr><td>Instagram Stories</td><td><span class="tag ok">Yes</span> plain photo or video only. Music and interactive stickers still need the phone app.</td><td>1</td></tr>
+<tr><td>Facebook Page posts</td><td><span class="tag ok">Yes</span></td><td>1</td></tr>
+<tr><td>LinkedIn company page posts</td><td><span class="tag warn">Yes, once LinkedIn approves</span></td><td>1</td></tr>
+<tr><td>Review and approval</td><td><span class="tag ok">Yes</span> for every post</td><td>1</td></tr>
+<tr><td>Analytics and reports</td><td><span class="tag ok">Yes</span> history from 3 Oct 2026, kept for good</td><td>2</td></tr>
+<tr><td>Audience: country, city, age, gender</td><td><span class="tag ok">Yes</span> what each network gives (see #30)</td><td>2</td></tr>
+<tr><td>Best time to post</td><td><span class="tag ok">Yes</span></td><td>2</td></tr>
+<tr><td>Comments inbox</td><td><span class="tag ok">Yes</span></td><td>3</td></tr>
+<tr><td>AI copy assistant, Claude connector</td><td><span class="tag">Optional</span></td><td>3</td></tr>
+<tr><td>Competitor tracking</td><td><span class="tag">Optional</span> Instagram business accounts only</td><td>3</td></tr>
+<tr><td>LinkedIn personal profile</td><td><span class="tag">Optional</span></td><td>3</td></tr>
+<tr><td>Team logins</td><td><span class="tag">Later</span> when it moves online</td><td>4</td></tr>
+<tr><td>Direct messages, ads, hashtag tracker, SmartLinks, other networks</td><td><span class="tag">No</span></td><td>&mdash;</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 5 -->
+<section id="approaches">
+<h2><span class="num">5</span>How we build it</h2>
+<div class="grid g2">
+  <div class="card rec"><h3>Chosen: Laravel + Filament, local first <span class="tag ok">Your pick</span></h3>
+    <ul class="tight">
+      <li>A complete app framework: timed jobs, a job queue, encryption, database changes, and a network client with test fakes.</li>
+      <li>Filament gives ready-made screens (forms, tables, dashboard, charts), "brands" for more accounts later, and a two-step login for when the app moves online.</li>
+      <li>Moves later to your existing Hostinger plan (PHP + MySQL + cron) at no extra hosting cost.</li>
+    </ul></div>
+  <div class="card"><h3>Considered and not chosen</h3>
+    <ul class="tight">
+      <li><b>WordPress on Local:</b> Local would have to be opened and the site started by hand for posts to go out, and it's heavier on memory.</li>
+      <li><b>Python app like Document Intelligence:</b> nothing to install, but going online would need a paid Hostinger VPS.</li>
+      <li><b>Next.js:</b> new hosting with monthly bills and large installs.</li>
+      <li><b>Ready-made tools (Postiz, Mixpost):</b> need a Docker server or a paid edition, and fit your approval rules less well.</li>
+    </ul></div>
+</div>
+</section>
+
+<!-- 6 -->
+<section id="tools">
+<h2><span class="num">6</span>Tools to install and use</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Area</th><th>Tool</th><th>Notes</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td>Language</td><td>PHP 8.5, installed with winget (Laravel 13 needs 8.3 or newer)</td><td>The extensions Laravel needs are switched on at setup. The Visual C++ runtime PHP needs is already installed.</td><td>Free</td></tr>
+<tr><td>Package installer</td><td>Composer 2.11 in <code>D:\Tools\ComposerSetup</code></td><td>Downloads Laravel and Filament into the project (about 100&nbsp;MB)</td><td>Free</td></tr>
+<tr><td>Framework</td><td>Laravel 13</td><td>Timed jobs, job queue, encryption, database changes, network client</td><td>Free</td></tr>
+<tr><td>Screens</td><td>Filament 5</td><td>Forms, tables, dashboard, charts, brands, two-step login for later. Its standard look needs no Node.js.</td><td>Free</td></tr>
+<tr><td>Calendar</td><td>FullCalendar, added as a Filament plugin or directly</td><td>Week and month views, drag to move</td><td>Free</td></tr>
+<tr><td>Database</td><td>SQLite: one file in the Data folder</td><td>No database server to run. MySQL on Hostinger later.</td><td>Free</td></tr>
+<tr><td>Running it</td><td>PHP's small web server on <code>127.0.0.1</code>, plus Windows Task Scheduler</td><td>Starts when you log in to Windows, and runs timed jobs every minute</td><td>Built in</td></tr>
+<tr><td>Instagram photo relay</td><td>Laravel's FTP storage, pointed at a hidden folder on your Hostinger site</td><td>Instagram downloads the photo from there; the app deletes it straight after</td><td>Existing hosting</td></tr>
+<tr><td>Network APIs</td><td>Meta Graph API (Facebook Page + Instagram through Facebook Login), LinkedIn Community Management API</td><td>Official routes only</td><td>Free</td></tr>
+<tr><td>Code backup and reviews</td><td>Git + private GitHub repo <code>TeamMoggi/SocialMedia_Manager</code></td><td>Branch &rarr; pull request &rarr; you merge</td><td>Free</td></tr>
+<tr><td>Data backup</td><td>A nightly password-protected (AES) zip of the Data folder</td><td>Saved to the Backups folder; you copy that folder to your USB drive weekly</td><td>Free</td></tr>
+<tr><td>Tests</td><td>Laravel's built-in tests (PHPUnit) with faked network replies. Python Playwright with Edge for screen checks.</td><td>Tests never post for real</td><td>Free</td></tr>
+<tr><td>Project records</td><td>Online tracker + local copy, development log (SM-0xx), How-to-use guide</td><td>The same records as moggies.in</td><td>Free</td></tr>
+<tr><td>Already on the laptop</td><td>Git, VS Code, Python, Windows Task Scheduler</td><td>Nothing new needed</td><td>&mdash;</td></tr>
+<tr><td>AI helper (optional, Phase 3)</td><td>Claude API</td><td>Caption drafts that follow your brand rules</td><td>Pay per use, small</td></tr>
+</tbody></table></div>
+<p class="muted">Not needed: Node.js, Docker, a MySQL server, Laravel Herd, or any paid Laravel or Filament service.</p>
+</section>
+
+<!-- 7 -->
+<section id="folders">
+<h2><span class="num">7</span>Folders on your laptop</h2>
+<pre class="tree">D:\Pravin\Moggi\SocialMedia_Manager\
+├─ App\        your running copy, always the approved (main) version; this plan is in App\docs
+├─ Dev\        Claude's working copy for new changes; test data only, posting switched to "dry run"
+├─ Data\       your database, photos and videos, settings and app key; never goes to GitHub
+├─ Backups\    nightly encrypted copies of Data
+├─ Metricool_Export_2026-11-14\   history saved from Metricool (imported in task #28)
+└─ AI Instagram\                  the Instagram plan and its tracker (unchanged)
+D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
+<p class="muted">Two copies keep the app safe while it's being built. Claude never works in the copy that posts to your real accounts. In the tracker, <b>local</b> means done in Dev and <b>live</b> means running in your App copy.</p>
+</section>
+
+<!-- 8 -->
+<section id="architecture">
+<h2><span class="num">8</span>How it fits together</h2>
+<div class="arch" role="img" aria-label="Diagram: you open the app on the laptop; Windows Task Scheduler runs the publisher and collector, which talk to the Meta and LinkedIn APIs; Instagram fetches photos from a hidden relay folder on the Hostinger website; data is backed up nightly; code goes from Dev through GitHub to App.">
+  <div class="row">
+    <div class="box"><b>You, on this laptop</b>Open the app in the browser at a local address (fixed at setup)</div>
+    <div class="box"><b>Windows Task Scheduler</b>Starts the app when you log in, and runs timed jobs every minute</div>
+  </div>
+  <div class="arrow">&darr;</div>
+  <div class="box app"><b>SocialMedia_Manager (App folder): Laravel + Filament</b>
+    <div class="grid g3" style="margin-top:6px">
+      <div class="box">Brands &amp; connected accounts</div>
+      <div class="box">Composer &amp; media checks</div>
+      <div class="box">Approval &amp; calendar</div>
+      <div class="box">Publisher (job queue)</div>
+      <div class="box">Analytics collector</div>
+      <div class="box">Dashboard, audience &amp; reports</div>
+    </div>
+    <p class="muted" style="margin:6px 0 0">Database, media and app key live in the Data folder. A nightly encrypted backup goes to Backups and a second place.</p>
+  </div>
+  <div class="arrow">&darr; official APIs (over the internet) &darr;</div>
+  <div class="row">
+    <div class="box"><b>Meta Graph API</b>Facebook Page + Instagram</div>
+    <div class="box"><b>LinkedIn API</b>Company page 145339181</div>
+    <div class="box"><b>Photo relay on Hostinger</b>A hidden folder on moggiesinternational.com that Instagram downloads from; files are deleted after use</div>
+  </div>
+  <div class="arrow">Code path: Dev &rarr; GitHub pull request &rarr; you merge &rarr; "Update and start" brings it into App</div>
+</div>
+
+<h3>How one post travels</h3>
+<ol class="steps">
+  <li>You (or Claude, later) write the post once, pick the networks and add photos or video. The app checks each network's rules and shows a preview per network.</li>
+  <li>The post waits for <b>approval</b>. You tick the brand-rules checklist (no real people's faces, AI people labelled, only approved figures and wording) and approve.</li>
+  <li><b>Facebook:</b> the post is handed to Facebook straight away with its time, so it goes out even if the laptop is off.</li>
+  <li><b>Instagram:</b> at the set time the app copies the photo to the hidden relay folder, Instagram downloads it, the app publishes, and the copy is deleted.</li>
+  <li><b>LinkedIn:</b> at the set time the app uploads the media and posts.</li>
+  <li>The network returns the post's link and the post shows <b>Published</b>. If something fails, the app retries 3 times over about 15 minutes, then marks it <b>Failed</b> and shows a Windows pop-up with the reason.</li>
+  <li>Every day the collector saves followers, reach, engagement and audience numbers.</li>
+</ol>
+
+<h3>When the laptop is off or asleep</h3>
+<ul class="tight">
+  <li>Facebook posts still go out (Facebook holds them).</li>
+  <li>Instagram and LinkedIn posts wait. When the app next starts, it lists them as <b>Missed</b> and asks you: post now, pick a new time, or skip. It never posts late on its own.</li>
+  <li>The analytics collector catches up for the days it missed, as far back as each network allows.</li>
+  <li>Tip: leave the laptop on and plugged in at post times. Windows can wake it from sleep for a scheduled job, but not from shut-down.</li>
+</ul>
+</section>
+
+<!-- 9 -->
+<section id="networks">
+<h2><span class="num">9</span>What each network allows</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Account</th><th>What the app can do</th><th>What we need</th><th>Approval from the network</th></tr></thead>
+<tbody>
+<tr><td><b>Facebook Page</b></td><td>Posts (text, photo, video, link) with Facebook's own scheduling; insights; comments; followers by country and city</td><td>A Meta developer account, one Meta Business app, you as app admin and Page admin</td><td><span class="tag ok">Not needed</span> while only people with a role on the app use it (Development mode)</td></tr>
+<tr><td><b>Instagram</b> moggies_international</td><td>Feed photos, carousels, Reels, Stories; insights; comments; followers by country, city, age and gender once the account has 100 followers</td><td>A Business account linked to the Facebook Page, the same Meta app, and the photo relay folder</td><td><span class="tag ok">Not needed</span> (same rule). Instagram caps API posts per account per day, far above our needs.</td></tr>
+<tr><td><b>LinkedIn company page</b> 145339181</td><td>Posts, follower and post statistics, followers by country/region, industry, job function, seniority and company size; comments</td><td>A separate LinkedIn developer app, verified by the company page, with a verified website</td><td><span class="tag warn">LinkedIn decides</span> (#9, #10). A Development tier comes first. The Standard tier must be applied for within 12 months (#41).</td></tr>
+<tr><td><b>LinkedIn profile</b> (optional)</td><td>Posts</td><td>"Share on LinkedIn", which is self-serve</td><td><span class="tag ok">Self-serve</span> (#40)</td></tr>
+</tbody></table></div>
+<p class="muted">Sign-in from the laptop: Meta and LinkedIn send you back to the app on its local address after you approve the connection. This is checked when the developer apps are created (#6, #9).</p>
+</section>
+
+<!-- 10 -->
+<section id="data">
+<h2><span class="num">10</span>Data we keep</h2>
+<div class="grid g2">
+  <div class="card"><h3>Planning</h3><ul class="tight">
+    <li><b>Brands:</b> Moggies International first, more later</li>
+    <li><b>Accounts:</b> network, page id, name, encrypted access, expiry, status</li>
+    <li><b>Posts:</b> main caption, state, time, approved when</li>
+    <li><b>Post per network:</b> caption change, network link, result, error, tries</li>
+    <li><b>Media:</b> file, type, size, shape, length, check results</li>
+    <li><b>Templates and hashtag sets</b> (Phase 3)</li>
+  </ul></div>
+  <div class="card"><h3>Results</h3><ul class="tight">
+    <li><b>Account daily:</b> followers, gained and lost, reach, views, page visits, clicks</li>
+    <li><b>Post snapshots:</b> likes, comments, shares, saves, reach, video views, at 1, 7 and 30 days</li>
+    <li><b>Audience snapshots:</b> country, city, age and gender (Instagram); country and city (Facebook); country/region, industry, job function, seniority and company size (LinkedIn). Saved weekly to show change over time.</li>
+    <li><b>Metricool history</b> from 3 Oct 2026 (imported)</li>
+    <li><b>Activity log:</b> every approval and publish attempt</li>
+  </ul></div>
+</div>
+</section>
+
+<!-- 11 -->
+<section id="security">
+<h2><span class="num">11</span>Security and privacy</h2>
+<ul class="tight">
+  <li><b>Only on this laptop:</b> the app answers only on <code>127.0.0.1</code>, so other devices on your Wi-Fi can't open it. Your Windows password or PIN protects it. Turn on Windows device encryption if the laptop offers it.</li>
+  <li><b>Account access</b> (network tokens) is encrypted with the app key. The key lives in the Data folder and in the encrypted backups, never in GitHub.</li>
+  <li><b>GitHub holds code only.</b> The Data folder sits outside the code folders, and a check in the routine stops data files from being committed.</li>
+  <li><b>Backups</b> are password-protected zips (AES). You keep the password. Without it a backup can't be opened, by anyone.</li>
+  <li><b>Photo relay:</b> random file names, deleted right after Instagram downloads them. The folder can't be listed or indexed, and its FTP account can only reach that folder.</li>
+  <li>Only the minimum permissions are asked from Meta and LinkedIn, and the app reminds you before access expires.</li>
+  <li>A short privacy policy for the app goes on moggiesinternational.com (#8), which Meta and LinkedIn ask for.</li>
+</ul>
+</section>
+
+<!-- 12 -->
+<section id="routine">
+<h2><span class="num">12</span>Working routine</h2>
+<ol class="steps">
+  <li>Claude works in <b>Dev</b> on a new branch, with test data and posting set to dry run.</li>
+  <li>A code commit, then a <code>docs:</code> commit with the log entry (next <b>SM-0xx</b> id), the tracker and the How-to-use guide.</li>
+  <li>Claude pushes and gives you the link to open the pull request. You merge it.</li>
+  <li>You double-click <b>Update and start</b> (it asks before changing anything, like Document Intelligence's). App takes the new version, updates its database and restarts. Claude checks it and marks the item live.</li>
+  <li>Local (Dev) and live (App) are tracked separately for every item.</li>
+  <li>You approve each commit. Nothing posts to a real account without your OK.</li>
+  <li>Each task starts in a fresh session from the tracker and the log, and Claude closes its test browsers after every check.</li>
+</ol>
+</section>
+
+<!-- 13 -->
+<section id="phases">
+<h2><span class="num">13</span>Phases and task list</h2>
+<p class="muted">These become the tracker's items. "Both" means Claude guides and you do the clicks that need your accounts. Numbers were redone in version 1.0.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>Task</th><th>Who</th><th>Waits on</th></tr></thead>
+<tbody>
+<tr class="phase"><td colspan="4">Phase 0: Set up (16&ndash;22 Nov 2026)</td></tr>
+<tr><td class="id">1</td><td><span class="tag ok">Done 14 Nov</span> Approve this plan (v1.0)</td><td>Owner</td><td>&mdash;</td></tr>
+<tr><td class="id">2</td><td><span class="tag ok">Done 14 Nov</span> Install PHP and Composer. You installed PHP 8.5 (winget) and Composer 2.11 (in <code>D:\Tools\ComposerSetup</code>); Claude switched on the extensions Laravel needs and checked everything.</td><td>Both</td><td>1</td></tr>
+<tr><td class="id">3</td><td><span class="tag ok">Done 14 Nov</span> Create the private GitHub repo <code>TeamMoggi/SocialMedia_Manager</code></td><td>Owner</td><td>1</td></tr>
+<tr><td class="id">4</td><td>Laravel + Filament project in App, the Dev copy, and the Data and Backups folders; first commit with this plan</td><td>Claude</td><td>2, 3</td></tr>
+<tr><td class="id">5</td><td>Online tracker + local copy, development log, How-to-use guide</td><td>Claude</td><td>1</td></tr>
+<tr><td class="id">6</td><td>Meta developer account and one Business app, you as admin</td><td>Both</td><td>1</td></tr>
+<tr><td class="id">7</td><td>Confirm Instagram is a Business account linked to the Facebook Page, and you are Page admin (Metricool's connection suggests yes)</td><td>Owner</td><td>&mdash;</td></tr>
+<tr><td class="id">8</td><td>App privacy policy page on moggiesinternational.com (through the website's usual branch and merge)</td><td>Claude</td><td>1</td></tr>
+<tr><td class="id">9</td><td>LinkedIn developer app for the company page, and the application for Community Management API access</td><td>Both</td><td>1, 8</td></tr>
+<tr><td class="id">10</td><td><b>LinkedIn approves our access to the company page</b> (Development tier). LinkedIn decides; you watch the developer-portal email and answer its questions. If it's refused, the app prepares posts for you to paste.</td><td>LinkedIn / Owner</td><td>9</td></tr>
+<tr><td class="id">11</td><td>Photo relay: an FTP account on Hostinger locked to one hidden folder on moggiesinternational.com</td><td>Both</td><td>1</td></tr>
+<tr><td class="id">12</td><td><span class="tag ok">Done 14 Nov</span> Save the Metricool history before the trial ends</td><td>Claude</td><td>&mdash;</td></tr>
+<tr><td class="id">13</td><td>Keep posting after the trial ends (about 29 Nov): Meta Business Suite for Facebook and Instagram, LinkedIn's own scheduler for the page, until the pilot (#26) passes</td><td>Owner</td><td>&mdash;</td></tr>
+<tr><td class="id">14</td><td><span class="tag ok">Decided 14 Nov</span> Second backup copy on <b>your USB drive</b>. You copy the Backups folder to it yourself, about once a week; the app reminds you after 7 days.</td><td>Owner</td><td>&mdash;</td></tr>
+
+<tr class="phase"><td colspan="4">Phase 1: Build and first posts (23 Nov &ndash; 20 Dec 2026)</td></tr>
+<tr><td class="id">15</td><td>App skeleton: Filament screens with Moggies branding, opens only on this laptop, no login screen, brands from day one</td><td>Claude</td><td>4</td></tr>
+<tr><td class="id">16</td><td>Start with Windows, timed jobs every minute, and an "Update and start" file</td><td>Claude</td><td>15</td></tr>
+<tr><td class="id">17</td><td>Encrypted account store + Connected accounts screen per brand</td><td>Claude</td><td>15</td></tr>
+<tr><td class="id">18</td><td>Connect the Facebook Page and Instagram</td><td>Claude</td><td>6, 7, 17</td></tr>
+<tr><td class="id">19</td><td>Connect the LinkedIn company page</td><td>Claude</td><td>10, 17</td></tr>
+<tr><td class="id">20</td><td>Media library with per-network checks</td><td>Claude</td><td>15</td></tr>
+<tr><td class="id">21</td><td>Composer: one post, per-network versions, previews, counters</td><td>Claude</td><td>20</td></tr>
+<tr><td class="id">22</td><td>Approval step with the brand-rules checklist</td><td>Claude</td><td>21</td></tr>
+<tr><td class="id">23</td><td>Calendar (week and month), drag to reschedule</td><td>Claude</td><td>22</td></tr>
+<tr><td class="id">24</td><td>Publisher: on-time posting, Facebook's own scheduling, Instagram relay, retries, the Missed list, Windows pop-ups</td><td>Claude</td><td>11, 16, 18, 22</td></tr>
+<tr><td class="id">25</td><td>Daily encrypted backup of Data to the Backups folder, the backup password (set by you in the app), and a USB-copy reminder</td><td>Claude</td><td>14, 15</td></tr>
+<tr><td class="id">26</td><td>Pilot: one approved post per network, then two weeks of real scheduling (LinkedIn joins when #19 is done)</td><td>Both</td><td>24, 25</td></tr>
+
+<tr class="phase"><td colspan="4">Phase 2: Analytics (21 Dec 2026 &ndash; 17 Jan 2027)</td></tr>
+<tr><td class="id">27</td><td>Daily collector for account and post numbers, catching up after the laptop was off</td><td>Claude</td><td>24</td></tr>
+<tr><td class="id">28</td><td>Import the saved Metricool history (#12) so charts start from 3 Oct 2026</td><td>Claude</td><td>12, 27</td></tr>
+<tr><td class="id">29</td><td>Dashboard: followers, reach, engagement, top posts, per network and together</td><td>Claude</td><td>27</td></tr>
+<tr><td class="id">30</td><td><span class="tag warn">You asked</span> <b>Audience breakdowns by country, city, age and gender</b>, saved weekly with charts and in the monthly report. Instagram gives all four once the account has 100 followers (67 now; the screen shows how many are still needed). Facebook gives country and city; Meta no longer gives age and gender for Pages. LinkedIn gives country/region, industry, job function, seniority and company size, but no age or gender.</td><td>Claude</td><td>27</td></tr>
+<tr><td class="id">31</td><td>Best time to post, from your own numbers</td><td>Claude</td><td>27 (needs a few weeks of data)</td></tr>
+<tr><td class="id">32</td><td>Monthly report, branded, printable to PDF</td><td>Claude</td><td>29, 30</td></tr>
+<tr><td class="id">33</td><td>Check our numbers against Meta Business Suite and LinkedIn page analytics for 3 weeks</td><td>Both</td><td>29</td></tr>
+
+<tr class="phase"><td colspan="4">Phase 3: Engage and grow (from late January 2027)</td></tr>
+<tr><td class="id">34</td><td>Comments inbox (Instagram, Facebook, LinkedIn page), reply from the app</td><td>Claude</td><td>18, 19</td></tr>
+<tr><td class="id">35</td><td>Content mix tracker: planned share per product range vs actual (using the Instagram plan's split once approved)</td><td>Claude</td><td>21</td></tr>
+<tr><td class="id">36</td><td>Caption templates and hashtag sets</td><td>Claude</td><td>21</td></tr>
+<tr><td class="id">37</td><td>Optional: AI caption helper with Claude</td><td>Claude</td><td>21, your OK</td></tr>
+<tr><td class="id">38</td><td>Optional: Claude connector, so Claude can draft posts into the app for your approval</td><td>Claude</td><td>22, your OK</td></tr>
+<tr><td class="id">39</td><td>Optional: competitor watch for Instagram business accounts</td><td>Claude</td><td>27</td></tr>
+<tr><td class="id">40</td><td>Optional: LinkedIn personal profile (MOGGIES India)</td><td>Claude</td><td>17, your OK</td></tr>
+<tr><td class="id">41</td><td>Apply for LinkedIn's Standard tier (needs a privacy policy and a screen recording). LinkedIn removes Development access if this isn't done within 12 months of approval.</td><td>Both</td><td>10, 19</td></tr>
+
+<tr class="phase"><td colspan="4">Phase 4: Go online (later, when you decide)</td></tr>
+<tr><td class="id">42</td><td>Hostinger subdomain, MySQL database, every-minute cron, SSL</td><td>Both</td><td>your decision</td></tr>
+<tr><td class="id">43</td><td>Login with a two-step check, team logins if wanted</td><td>Claude</td><td>42</td></tr>
+<tr><td class="id">44</td><td>Automatic deploy from GitHub, the same as moggies.in</td><td>Both</td><td>42</td></tr>
+<tr><td class="id">45</td><td>Move the data from the laptop to MySQL, and switch the photo relay to the app's own address</td><td>Claude</td><td>43, 44</td></tr>
+<tr><td class="id">46</td><td>Meta App Review, only if other businesses will sign in themselves</td><td>Both</td><td>45</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 14 -->
+<section id="timeline">
+<h2><span class="num">14</span>Timeline and costs</h2>
+<p class="muted">This assumes a few working sessions a week, as on moggies.in.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>When</th><th>Ends with</th></tr></thead>
+<tbody>
+<tr><td>0 Set up</td><td>16&ndash;22 Nov 2026</td><td>Tools installed, project and tracker ready, Meta app made. LinkedIn's review keeps running in the background.</td></tr>
+<tr><td>1 Build and first posts</td><td>23 Nov &ndash; 20 Dec 2026</td><td>Approved posts publish themselves on Facebook and Instagram, and on LinkedIn once approved</td></tr>
+<tr><td>2 Analytics</td><td>21 Dec 2026 &ndash; 17 Jan 2027</td><td>Dashboard, audience breakdowns and monthly report, with history from 3 Oct</td></tr>
+<tr><td>3 Engage and grow</td><td>From late January 2027</td><td>Item by item, in the order you choose</td></tr>
+<tr><td>4 Go online</td><td>When you decide</td><td>The app on Hostinger with a login</td></tr>
+</tbody></table></div>
+<div class="note">The Metricool trial ends around 29 Nov. Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler (#13). Nothing waits for this app.</div>
+<h3>Costs</h3>
+<ul class="tight">
+  <li><b>All tools</b> (PHP, Composer, Laravel, Filament, FullCalendar, SQLite, Git, GitHub private repo): free.</li>
+  <li><b>Meta and LinkedIn APIs:</b> free.</li>
+  <li><b>Photo relay:</b> uses your existing Hostinger hosting.</li>
+  <li><b>Claude API</b> (only if the AI helper is used): pay per use, small at 3&ndash;10 posts a week.</li>
+  <li><b>Later, going online:</b> your existing Hostinger plan if it has room for one more site; otherwise a plan upgrade.</li>
+</ul>
+</section>
+
+<!-- 15 -->
+<section id="risks">
+<h2><span class="num">15</span>Risks</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>What we do</th></tr></thead>
+<tbody>
+<tr><td>Laptop off or asleep at post time</td><td>Instagram or LinkedIn post late</td><td>Facebook holds its own posts. The others go to the Missed list for you to decide. The guide explains wake-from-sleep.</td></tr>
+<tr><td>Laptop lost, stolen or its disk fails</td><td>The app and its data are gone</td><td>Code is on GitHub. Data is in nightly encrypted backups in a second place. The guide has the reinstall steps.</td></tr>
+<tr><td>Backup password or app key lost</td><td>Backups can't be opened, or account access can't be read</td><td>You keep the password safe. Losing the key only means reconnecting the accounts.</td></tr>
+<tr><td>LinkedIn refuses or delays access</td><td>No automatic company-page posts or statistics</td><td>Apply in week one. The app prepares posts for you to paste until access comes.</td></tr>
+<tr><td>Meta or LinkedIn change their API, or access expires</td><td>Posts fail</td><td>Fixed API versions, reminders before expiry, a failure pop-up after retries</td></tr>
+<tr><td>Instagram can't download a photo from the relay</td><td>An Instagram post fails</td><td>Retries and a pop-up. The relay is tested in the pilot.</td></tr>
+<tr><td>Some post features exist only in the phone apps</td><td>A few post types can't be automated</td><td>The composer says so and reminds you</td></tr>
+<tr><td>Small laptop memory (5.9 GB)</td><td>Slowness</td><td>The app uses about 100 MB, with no Node.js or Docker. Test browsers are closed after checks.</td></tr>
+<tr><td>Hand-built code with one maintainer</td><td>Hard to pick up later</td><td>Log, tracker, guide and tests, as on the websites</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- 16 -->
+<section id="questions">
+<h2><span class="num">16</span>Still needed from you</h2>
+<div class="note ok"><b>Answered 14 Nov 2026:</b> plan approved, which covers installing PHP and Composer in <code>D:\Tools</code>. The second backup copy goes on your USB drive, and that copying is your task. The step-by-step build plan for the first part (foundation) is in <code>docs\superpowers\plans\2026-11-14-foundation.md</code>.</div>
+</section>
+
+<!-- 17 -->
+<section id="calls">
+<h2><span class="num">17</span>Calls I made for you to check</h2>
+<ul class="tight">
+  <li>Two copies of the code: App (yours, always the approved version) and Dev (Claude's, test data, dry-run posting). Data and Backups sit outside both.</li>
+  <li>The app opens only on this laptop, with no login screen until it goes online.</li>
+  <li>Missed posts never go out late without asking you. Facebook posts are handed to Facebook in advance.</li>
+  <li>The Instagram photo relay uses your existing moggiesinternational.com hosting.</li>
+  <li>Alerts appear in the app and as Windows pop-ups for now; email comes when the app is online.</li>
+  <li>The personal LinkedIn profile is left out for now (optional #40).</li>
+  <li>Brands are built in from day one, with Moggies International first.</li>
+  <li>With the trial ending, numbers are checked against Meta Business Suite and LinkedIn's analytics, not Metricool.</li>
+  <li>Time zone Asia/Kolkata. Log ids SM-0xx. Repo <code>TeamMoggi/SocialMedia_Manager</code>. Everything on the D: drive.</li>
+</ul>
+</section>
+
+<!-- 18 -->
+<section id="sources">
+<h2><span class="num">18</span>Sources</h2>
+<p class="muted">API facts were checked on 14 November 2026 and are checked again at build time.</p>
+<ul class="tight">
+  <li><a href="https://developers.facebook.com/docs/instagram-platform/content-publishing/">Instagram Platform: Content Publishing</a> and <a href="https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/content_publishing_limit">Content Publishing Limit</a></li>
+  <li><a href="https://developers.facebook.com/docs/instagram-platform/api-reference/instagram-user/insights">Instagram Account Insights</a> (follower demographics need 100+ followers)</li>
+  <li><a href="https://developers.facebook.com/documentation/instagram-platform/overview">Instagram Platform overview</a></li>
+  <li><a href="https://developers.facebook.com/docs/development/build-and-test/app-roles">Meta: App roles</a>, <a href="https://developers.facebook.com/docs/development/build-and-test">Build and test</a>, <a href="https://developers.facebook.com/docs/permissions">Permissions reference</a></li>
+  <li><a href="https://developer.linkedin.com/product-catalog/marketing/community-management-api">LinkedIn: Community Management API</a>, <a href="https://learn.microsoft.com/en-us/linkedin/marketing/community-management/community-management-overview">overview</a>, <a href="https://learn.microsoft.com/en-us/linkedin/marketing/community-management-app-review">app review</a>, <a href="https://learn.microsoft.com/linkedin/marketing/increasing-access">increasing access</a></li>
+  <li>Metricool's metric list (14 Nov 2026): Facebook Page age and gender metrics marked discontinued</li>
+</ul>
+</section>
+
+<footer>
+  Moggies International &middot; SocialMedia_Manager project plan v1.0 &middot; 14 November 2026 &middot; Prepared with Claude as solution architect. Earlier drafts: v0.1 (WordPress, hosted) and v0.2 (local-first decision).
+</footer>
+
+</div>
+</body>
+</html>
