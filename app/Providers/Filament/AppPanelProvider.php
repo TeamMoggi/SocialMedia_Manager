@@ -2,7 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Tenancy\EditBrand;
+use App\Filament\Pages\Tenancy\RegisterBrand;
 use App\Http\Middleware\AutoLoginLocalOwner;
+use App\Models\Brand;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -34,6 +37,10 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('brand/favicon.png'))
             ->colors(['primary' => Color::hex('#1b4c86')])
             ->databaseNotifications()
+            // Brands (Moggies International first): every screen works inside one brand, at /<brand-slug>.
+            ->tenant(Brand::class, slugAttribute: 'slug')
+            ->tenantRegistration(RegisterBrand::class)
+            ->tenantProfile(EditBrand::class)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([Dashboard::class])
