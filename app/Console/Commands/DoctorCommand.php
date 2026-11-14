@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\System\SystemHealth;
+use App\Models\Setting;
 use App\Support\PublishGuard;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
@@ -30,6 +31,7 @@ class DoctorCommand extends Command
         $this->checkZipEncryption();
         $this->checkPublishMode();
         $this->checkTimedJobs();
+        $this->checkBackupPassword();
 
         foreach ($this->results as [$level, $message]) {
             $this->line(str_pad($level, 6).$message);
@@ -107,6 +109,18 @@ class DoctorCommand extends Command
             return;
         }
         $this->add('OK', 'Publish mode: '.PublishGuard::effectiveMode($configured, base_path()));
+    }
+
+    private function checkBackupPassword(): void
+    {
+        try {
+            $set = Setting::getSecret('backup_password') !== null;
+        } catch (Throwable) {
+            return; // the database or key check above already reported the problem
+        }
+        $set
+            ? $this->add('OK', 'Backup password is set')
+            : $this->add('WARN', 'Backup password not set: open Backups in the app (no backups until then)');
     }
 
     private function checkTimedJobs(): void
