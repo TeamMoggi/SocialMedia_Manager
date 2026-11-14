@@ -4,6 +4,25 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-003 — Brands, starting with Moggies International (14 Nov 2026)
+
+**Tracker:** #15 (app skeleton: brands).
+
+**What changed**
+- Every screen now works inside one **brand**. Moggies International is the first; the app opens straight into it (address `/moggies-international`).
+- Another business can be added from the brand menu at the top left ("Add a brand"), for example Moggies Export Services. Each brand will have its own accounts, posts and numbers. Names must be different.
+- "Brand settings" holds the brand's name and the time zone used for post times and reports (Asia/Kolkata by default).
+
+**Why:** the owner may add accounts beyond Moggies later; building brands in from the start avoids reworking every screen.
+
+**Checks:** 19 tests pass, including: the app opens on Moggies International; adding "Moggies Export Services" creates it with the address `moggies-export-services`, the India time zone, and the owner attached; a second brand with the same name is refused; a brand the owner isn't attached to answers "not found".
+
+**Commits:** see the branch `feat/sm-003-brands`; docs: this entry.
+
+**Where:** Dev — done. App — after the owner merges `feat/sm-002-panel`, then `feat/sm-003-brands`.
+
+---
+
 ## SM-002 — The app's screens, this laptop only, no login (14 Nov 2026)
 
 **Tracker:** #15 (app skeleton; brands follow in SM-003).
