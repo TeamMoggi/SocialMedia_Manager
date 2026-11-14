@@ -30,3 +30,7 @@ Thumbs.db
 .data-dir
 /.superpowers/
 *.sqlite
+# Filament's published assets are rebuilt by composer (filament:upgrade)
+/public/css/filament
+/public/js/filament
+/public/fonts/filament
