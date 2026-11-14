@@ -4,6 +4,31 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-007 — Runs only when needed (14 Nov 2026)
+
+**Tracker:** #16 (changed at the owner's request: "keeping the app running every time will hamper my system").
+
+**Measured before the change (App, 14 Nov):** the always-running server used about 47 MB of memory; the every-minute job started PowerShell and PHP 60 times an hour (about 4 seconds of work and 66 MB each time).
+
+**What changed**
+- **Desktop shortcut "SocialMedia Manager"** starts the app (about 2 seconds) and opens it. The app **stops itself after 30 minutes without use**; while stopped it uses no memory or CPU. An open browser tab no longer checks for messages in the background, so it does not keep the app awake (new messages appear when a page is opened).
+- **Daily jobs once a day** (account check and backup) at 09:00 through one Windows task, or as soon as the laptop is on after a missed 09:00. They no longer run every minute. Each job runs directly, so a late start still does all of them, and a backup problem does not stop the account check.
+- The Windows tasks **Server** and **Tick** are removed by the new install; only **Daily** remains. It never wakes the laptop and has a 1-hour limit, so a long backup no longer delays anything else (this was a deferred item from the foundation review).
+- The status card and `smm:doctor` now say when the **daily jobs** last ran (orange after 26 hours).
+- For posting (next build plan), the plan is a one-time wake-up at each approved Instagram/LinkedIn post's time instead of a job every minute.
+
+**Checks**
+- 67 tests pass, including: a page visit records use, the `/up` health check does not; the app stops at exactly 30 minutes without use, not at 29; `smm:daily` run late (11:23 after a missed 09:00) still checks accounts and records the run, and keeps going without a backup password; the wording for minutes, hours and days; no job is scheduled every minute.
+- On the Dev copy: start → the app and its watcher run; daily jobs → "Daily jobs ran less than a minute ago"; stop → nothing left running; with a 1-minute limit and only `/up` checks, the app stopped by itself after 83 seconds. All scripts parse in Windows PowerShell 5.1 and are plain ASCII.
+
+**To do on App after merging:** update App, then run `install-tasks.ps1` (one Windows prompt): it removes Server and Tick, adds Daily, and puts the shortcut on the desktop.
+
+**Commits:** see the branch `feat/sm-007-on-demand`; docs: this entry.
+
+**Where:** Dev — done. App — after the owner merges `feat/sm-007-on-demand`.
+
+---
+
 ## SM-006 — Daily encrypted backups and the USB reminder (14 Nov 2026)
 
 **Tracker:** #25 (and #14: the USB copy is the owner's task).
