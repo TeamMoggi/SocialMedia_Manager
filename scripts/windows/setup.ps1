@@ -5,6 +5,9 @@
   file (.env) there, creates the database, and runs the self-check. Safe to run again: it never
   replaces an existing app key (that would make saved account access unreadable).
 
+  Order on a fresh copy (for example a new laptop): download the code from GitHub, then run this
+  script; it installs the packages itself.
+
   Examples (Windows PowerShell):
     .\scripts\windows\setup.ps1 -DataDir D:\Pravin\Moggi\SocialMedia_Manager\Data -PublishMode live -BackupDir D:\Pravin\Moggi\SocialMedia_Manager\Backups
     .\scripts\windows\setup.ps1 -DataDir D:\Pravin\Moggi\SocialMedia_Manager\DevData -PublishMode dry-run -Port 8091
@@ -59,10 +62,18 @@ Set-EnvValue $envFile 'DB_DATABASE' "'$db'"
 Set-EnvValue $envFile 'APP_URL' "http://127.0.0.1:$Port"
 if ($PublishMode -eq 'live') { Set-EnvValue $envFile 'APP_DEBUG' 'false' } else { Set-EnvValue $envFile 'APP_DEBUG' 'true' }
 
-# 4. App key (only when empty), database tables, self-check
+# 4. Packages (a fresh copy has none; Laravel can only start once .data-dir exists, so this comes after step 2)
 $php = (Get-Command php -ErrorAction Stop).Source
 Push-Location $repo
 try {
+    if (-not (Test-Path (Join-Path $repo 'vendor\autoload.php'))) {
+        & composer install --no-interaction
+        if ($LASTEXITCODE -ne 0) { throw 'composer install failed' }
+    }
+    & $php artisan package:discover
+    if ($LASTEXITCODE -ne 0) { throw 'package:discover failed' }
+
+    # 5. App key (only when empty), database tables, self-check
     $keyLine = Select-String -Path $envFile -Pattern '^APP_KEY=(.*)$' | Select-Object -First 1
     if (-not $keyLine -or $keyLine.Matches[0].Groups[1].Value.Trim() -eq '') {
         & $php artisan key:generate --force

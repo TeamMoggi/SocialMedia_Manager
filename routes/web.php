@@ -2,6 +2,4 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// The app's screens (Filament) are registered by App\Providers\Filament\AppPanelProvider at '/'.

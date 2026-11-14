@@ -14,6 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // The owner user and the first brand are added in later steps; no sample users here.
+        $this->call([OwnerSeeder::class, BrandSeeder::class]);
     }
 }
