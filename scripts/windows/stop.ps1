@@ -1,9 +1,11 @@
 <#
-  Stops this copy's web server (only the PHP server on this copy's port; nothing else).
+  Stops this copy of the app now: its PHP server on this copy's port, nothing else.
+  The watcher (php artisan smm:serve) notices its server is gone and exits within 15 seconds.
 #>
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'common.ps1')
 
+# Older installs (before SM-007) ran the app as a Windows task.
 $task = Get-SmmServerTask
 if ($task -and $task.State -eq 'Running') {
     Stop-ScheduledTask -TaskPath $SmmTaskPath -TaskName 'Server'
