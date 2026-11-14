@@ -4,6 +4,25 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-004 — Encrypted store for account access (14 Nov 2026)
+
+**Tracker:** #17.
+
+**What changed**
+- A **Connected accounts** screen per brand lists each Facebook Page, Instagram account and LinkedIn company page with its state: Connected, Access expires soon, Access expired (reconnect), or Problem (reconnect). Each can be **disconnected** (the app forgets its access; published posts stay online). Connecting accounts comes with the Facebook/Instagram and LinkedIn steps.
+- Account access (the networks' tokens) is stored **encrypted** with the app key and never shown in lists, exports or logs.
+- Every day at 09:00 India time the app checks each account. When access is about to expire (7 days) or has expired, a message appears under the bell, once per change.
+
+**Why:** the tokens can post as the business; the plan says they are encrypted and that the app warns before access runs out.
+
+**Checks:** 29 tests pass, including: the database never holds a token in plain text; tokens are left out of any list or export of an account; the daily check marks an account expiring 3 days ahead and sends exactly one message even when run twice; each brand sees only its own accounts; the six expiry cases (none, passed, 3 days, 30 days, a problem stays a problem, fine again after reconnecting).
+
+**Commits:** see the branch `feat/sm-004-accounts`; docs: this entry.
+
+**Where:** Dev — done. App — after the owner merges `feat/sm-002-panel`, `feat/sm-003-brands`, then `feat/sm-004-accounts`.
+
+---
+
 ## SM-003 — Brands, starting with Moggies International (14 Nov 2026)
 
 **Tracker:** #15 (app skeleton: brands).
