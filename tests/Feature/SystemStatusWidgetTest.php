@@ -18,7 +18,7 @@ class SystemStatusWidgetTest extends TestCase
 
         Livewire::test(SystemStatusWidget::class)
             ->assertSee('Dry run: nothing is posted')
-            ->assertSee('Timed jobs have not run yet')
+            ->assertSee('Daily jobs have not run yet')
             ->assertSee(app('smm.data_dir'));
     }
 
@@ -28,7 +28,7 @@ class SystemStatusWidgetTest extends TestCase
         Setting::put('heartbeat_at', now()->subMinute()->utc()->toIso8601String());
 
         Livewire::test(SystemStatusWidget::class)
-            ->assertSee('Timed jobs ran 1 minute ago')
+            ->assertSee('Daily jobs ran 1 minute ago')
             ->assertDontSee('have not run');
     }
 }

@@ -132,7 +132,7 @@ class DoctorCommand extends Command
         }
         $now = CarbonImmutable::now();
         $health->schedulerIsStale($now)
-            ? $this->add('WARN', 'Timed jobs have not run in the last '.config('smm.heartbeat_stale_minutes').' minutes (are the Windows tasks installed?)')
+            ? $this->add('WARN', 'Daily jobs have not run in the last '.intdiv((int) config('smm.heartbeat_stale_minutes'), 60).' hours (is the Windows task installed and the laptop on at times?)')
             : $this->add('OK', $health->describe($now));
     }
 }

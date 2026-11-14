@@ -12,7 +12,7 @@
             <span style="font-size:.85rem;opacity:.8">Data folder: <code>{{ $dataDir }}</code></span>
         </div>
         @if ($timedJobsStale)
-            <p style="font-size:.85rem;margin-top:.6rem;opacity:.85">Timed jobs post at the set times and run the daily checks. If this stays orange, run "Update and start" or ask Claude to check the Windows tasks.</p>
+            <p style="font-size:.85rem;margin-top:.6rem;opacity:.85">The daily jobs check account access and make the backup. They run at 09:00, or as soon as the laptop is on after that. If this stays orange for more than a day, tell Claude.</p>
         @endif
     </x-filament::section>
 </x-filament-widgets::widget>

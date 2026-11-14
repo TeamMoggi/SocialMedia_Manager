@@ -2,10 +2,8 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-// Timed jobs. On the laptop, Windows Task Scheduler runs `php artisan schedule:run` every minute (SM-005).
-
-// Proof that timed jobs run (status card, smm:doctor).
-Schedule::command('smm:heartbeat')->everyMinute();
+// On the laptop the Windows task "\SocialMediaManager\Daily" runs `php artisan smm:daily` once a day (SM-007),
+// which runs the jobs below directly. This schedule is for a hosted copy with a cron job (Phase 4).
 
 // Daily encrypted backup: checked every hour, made when the last one is over 20 hours old
 // (so a laptop that was off at night still gets its backup later in the day).
