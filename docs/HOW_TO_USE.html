@@ -41,13 +41,20 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 14 November 2026<br>Up to SM-001</div>
+  <div class="meta">Updated 14 November 2026<br>Up to SM-002</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> the foundation is being built. There are no screens to open yet; they come in the next step (SM-002). Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> the foundation is being built. The app's screens exist (SM-002); a one-click way to start and open them comes with SM-005. Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+
+<h2>What you will see</h2>
+<ul>
+<li>The app opens in your browser at a local address on this laptop (from SM-005: <code>http://127.0.0.1:8090</code>).</li>
+<li>There is <b>no login screen</b>: on this laptop you are signed in automatically as the owner. Other devices, even on your Wi-Fi, are refused.</li>
+<li>The top bar shows the Moggies International mark and name, and a bell for messages from the app (for example "account access expires soon").</li>
+</ul>
 
 <h2>Where everything lives</h2>
 <div class="table-wrap"><table>
@@ -69,7 +76,7 @@ php artisan smm:doctor</pre>
 <p>Every line should start with <b>OK</b>. On your App copy the last line reads <code>Publish mode: live</code>. A line starting with <b>FAIL</b> says what is wrong and how to fix it; send it to Claude if it is not clear.</p>
 
 <h2>For Claude: setting up a copy</h2>
-<p>Only needed once per copy, or on a new laptop after the code is downloaded from GitHub and <code>composer install</code> has run. It never replaces an existing app key.</p>
+<p>Only needed once per copy, or on a new laptop after the code is downloaded from GitHub (the script installs the packages itself). It never replaces an existing app key.</p>
 <pre>powershell -ExecutionPolicy Bypass -File .\scripts\windows\setup.ps1 -DataDir D:\Pravin\Moggi\SocialMedia_Manager\Data -PublishMode live -BackupDir D:\Pravin\Moggi\SocialMedia_Manager\Backups</pre>
 <p>The tools it needs are PHP 8.5 (installed with winget) and Composer (<code>D:\Tools\ComposerSetup</code>). If a PHP upgrade ever resets PHP's settings, <code>smm:doctor</code> reports the missing extensions.</p>
 

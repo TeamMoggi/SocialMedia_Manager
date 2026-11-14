@@ -4,6 +4,29 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-002 — The app's screens, this laptop only, no login (14 Nov 2026)
+
+**Tracker:** #15 (app skeleton; brands follow in SM-003).
+
+**What changed**
+- Filament 5.11 (with Livewire 4.4) gives the app its screens at the app's home address. The header shows the Moggies International mark on a white plate with the name as live text and "SocialMedia Manager" under it; Moggies blue (#1b4c86) for buttons and links. A bell for in-app notifications.
+- On the laptop, any request from another device (for example a phone on the same Wi-Fi) is refused, and the owner is signed in automatically, so there is no login screen. When the app moves online (Phase 4) the normal login takes over.
+- `setup.ps1` now writes `.data-dir` before installing packages, so a fresh copy (a new laptop) needs only the code and this script. Found while creating the Dev copy: Composer's last step could not run without a data folder.
+- Dev copy created: `D:\Pravin\Moggi\SocialMedia_Manager\Dev` (branch work, dry run) with its own `DevData` folder.
+
+**Why:** "local first, no login for now" from the plan, with the brand rule (mark on a light plate, live-text name).
+
+**Checks**
+- 15 tests pass, including: opening the app from the laptop shows the dashboard signed in as the owner; a request from 192.168.1.20 gets "forbidden"; in hosted mode nobody is signed in automatically; the header shows the company name and the logo's alt text.
+- Opened in Edge at desktop and phone width: dashboard, brand header, no login form, no script errors.
+- Found and fixed while testing: Laravel moves its login check ahead of other steps, so the automatic sign-in had to sit right after the session starts.
+
+**Commits:** `e989797` (setup fix), `688dd3f` (screens); docs: this entry.
+
+**Where:** Dev — done, checked in the browser. App — after the owner merges `feat/sm-002-panel`.
+
+---
+
 ## SM-001 — Tools, the Laravel skeleton and the data folder (14 Nov 2026)
 
 **Tracker:** #2 (tools, done), #4 (project and folders).
