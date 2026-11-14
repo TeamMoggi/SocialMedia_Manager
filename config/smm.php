@@ -14,7 +14,11 @@ return [
     'backup_keep' => 14,
     'usb_reminder_days' => 7,
 
-    'heartbeat_stale_minutes' => 3,
+    // The app stops after this many minutes without use (smm:serve).
+    'idle_minutes' => 30,
+
+    // The daily jobs (smm:daily) count as late after 26 hours.
+    'heartbeat_stale_minutes' => 1560,
     'token_expiry_warning_days' => 7,
 
     'display_timezone' => 'Asia/Kolkata',
