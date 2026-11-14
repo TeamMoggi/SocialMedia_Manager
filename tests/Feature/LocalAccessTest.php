@@ -31,6 +31,20 @@ class LocalAccessTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_request_naming_another_site_is_refused(): void
+    {
+        // DNS rebinding: a web page's own domain pointed at 127.0.0.1 must not reach the signed-in app.
+        $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])
+            ->get('http://evil.example:8090/')
+            ->assertForbidden();
+
+        $this->assertGuest();
+
+        $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])
+            ->get('http://127.0.0.1:8090/up')
+            ->assertOk();
+    }
+
     public function test_hosted_mode_does_not_auto_login(): void
     {
         config(['smm.mode' => 'hosted']);
