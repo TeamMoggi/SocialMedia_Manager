@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Domain\System\SystemHealth;
 use App\Support\PublishGuard;
+use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,7 @@ class DoctorCommand extends Command
         $this->checkDatabase($migrator);
         $this->checkZipEncryption();
         $this->checkPublishMode();
+        $this->checkTimedJobs();
 
         foreach ($this->results as [$level, $message]) {
             $this->line(str_pad($level, 6).$message);
@@ -104,5 +107,18 @@ class DoctorCommand extends Command
             return;
         }
         $this->add('OK', 'Publish mode: '.PublishGuard::effectiveMode($configured, base_path()));
+    }
+
+    private function checkTimedJobs(): void
+    {
+        try {
+            $health = SystemHealth::current();
+        } catch (Throwable) {
+            return; // the database check above already reported the problem
+        }
+        $now = CarbonImmutable::now();
+        $health->schedulerIsStale($now)
+            ? $this->add('WARN', 'Timed jobs have not run in the last '.config('smm.heartbeat_stale_minutes').' minutes (are the Windows tasks installed?)')
+            : $this->add('OK', $health->describe($now));
     }
 }
