@@ -32,6 +32,7 @@ table{border-collapse:collapse;width:100%;font-size:14px}
 th,td{text-align:left;vertical-align:top;padding:8px 12px;border-bottom:1px solid var(--line)}
 th{background:var(--brand-soft)}tr:last-child td{border-bottom:none}
 a{color:var(--brand)}
+.muted{color:var(--muted)}
 footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:12px}
 @media (max-width:600px){.meta{margin-left:0;text-align:left}}
 </style>
@@ -41,20 +42,37 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 14 November 2026<br>Up to SM-004</div>
+  <div class="meta">Updated 14 November 2026<br>Up to SM-005</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> the foundation is being built. The app's screens exist (SM-002); a one-click way to start and open them comes with SM-005. Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> the foundation is being built. The app runs on this laptop; posting comes in the next build plan. Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
 
 <h2>What you will see</h2>
 <ul>
-<li>The app opens in your browser at a local address on this laptop (from SM-005: <code>http://127.0.0.1:8090</code>).</li>
+<li>The app opens in your browser at <code>http://127.0.0.1:8090</code>. Bookmark it.</li>
 <li>There is <b>no login screen</b>: on this laptop you are signed in automatically as the owner. Other devices, even on your Wi-Fi, are refused.</li>
 <li>The top bar shows the Moggies International mark and name, and a bell for messages from the app (for example "account access expires soon").</li>
 </ul>
+
+<h2>Starting and updating</h2>
+<ul>
+<li><b>Normally you do nothing:</b> the app starts by itself when Windows starts, and its timed jobs run every minute in the background (no window).</li>
+<li><b>To install approved changes, or if the app does not open:</b> double-click <b>Update and start.bat</b> in the App folder. It shows the changes waiting, asks <i>Install them now? (Y/N)</i>, then restarts the app and opens it. If nothing is waiting it says <i>Already up to date</i> and just opens the app.</li>
+<li>If it says <i>Your App folder has changes</i>, nothing was changed; send the message to Claude.</li>
+</ul>
+<h3>The status card on the dashboard</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>You see</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><b>Live: approved posts are published</b></td><td>This is your App copy; approved posts go out for real.</td></tr>
+<tr><td><b>Dry run: nothing is posted</b></td><td>A test copy (Dev). Nothing reaches your accounts.</td></tr>
+<tr><td><b>Timed jobs ran 1 minute ago</b> (green)</td><td>Everything that happens on a timer is running.</td></tr>
+<tr><td><b>Timed jobs ... </b> (orange)</td><td>They have not run for more than 3 minutes: the laptop was asleep, or the Windows tasks are missing. Run <b>Update and start.bat</b>; if it stays orange, tell Claude.</td></tr>
+</tbody></table></div>
+<p class="muted">The laptop must be on (and awake) for timed jobs to run. Windows does not wake the laptop for them.</p>
 
 <h2>Brands</h2>
 <p>Everything in the app belongs to a <b>brand</b>: its connected accounts, posts and numbers. <b>Moggies International</b> is the first, and the app opens straight into it.</p>
@@ -93,6 +111,11 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <pre>cd D:\Pravin\Moggi\SocialMedia_Manager\App
 php artisan smm:doctor</pre>
 <p>Every line should start with <b>OK</b>. On your App copy the last line reads <code>Publish mode: live</code>. A line starting with <b>FAIL</b> says what is wrong and how to fix it; send it to Claude if it is not clear.</p>
+
+<h2>For Claude: the Windows tasks</h2>
+<p>Installed once from the App copy (one administrator prompt for the owner). They run as the owner without storing the password, never wake the laptop, and the Server task has no time limit.</p>
+<pre>powershell -ExecutionPolicy Bypass -File .\scripts\windows\install-tasks.ps1</pre>
+<p>Other scripts in <code>scripts\windows</code>: <code>start.ps1 [-Open]</code>, <code>stop.ps1</code>, <code>tick.ps1</code> (one run of the timed jobs), <code>serve.ps1</code> (used by the Server task). Logs are in the data folder's <code>logs</code> folder.</p>
 
 <h2>For Claude: setting up a copy</h2>
 <p>Only needed once per copy, or on a new laptop after the code is downloaded from GitHub (the script installs the packages itself). It never replaces an existing app key.</p>

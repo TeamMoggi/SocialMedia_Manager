@@ -4,6 +4,32 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-005 — Timed jobs, the status card, starting with Windows (14 Nov 2026)
+
+**Tracker:** #16.
+
+**What changed**
+- **Update and start.bat** in the App folder: double-click it to bring in the changes you approved on GitHub, update the app and its database, restart it and open it in the browser. It lists the changes and asks before installing, and stops without touching anything if the App folder has local changes.
+- Two Windows tasks (installed once from the App copy, one administrator prompt): **Server** starts the app at `http://127.0.0.1:8090` when Windows starts and keeps it running with no time limit; **Tick** runs the timed jobs every minute (posting at the set times later, the daily account check now). They run without a window and without storing your password, and they never wake the laptop.
+- A **status card** on the dashboard: Live or Dry run, when the timed jobs last ran (orange if more than 3 minutes ago), and the data folder.
+- `smm:doctor` now also says when the timed jobs last ran.
+- Scripts: `start.ps1` (refuses if another program uses the port), `stop.ps1` (stops only this copy's server), `serve.ps1`, `tick.ps1`, `install-tasks.ps1`, `update.ps1`.
+
+**Why:** posts must go out on time without opening anything, and updates must be one double-click.
+
+**Checks**
+- 40 tests pass, including: settings and encrypted secrets; the heartbeat records the time; the heartbeat is scheduled every minute; 2 minutes is fresh and 5 is stale; the card shows "Dry run: nothing is posted" and "Timed jobs ran 1 minute ago"; the self-check warns when timed jobs have not run.
+- Scripts run on the Dev copy: start → the app answers on port 8091; start again → "already running"; tick → the self-check shows "Timed jobs ran less than a minute ago"; stop → the port is free with no PHP left running; another program on the port → "Port 8091 is used by another program"; update on a branch other than main → refused. All scripts parse in Windows PowerShell 5.1 and are plain ASCII.
+- Found and fixed: Windows PowerShell 5.1 treated PHP's normal start-up message as an error and stopped the server; the scripts now let Windows handle the output.
+
+**Still to check on App after merging:** install the tasks (one Windows prompt), confirm the Server task has no time limit, the app opens at `http://127.0.0.1:8090`, and the status card turns green within 2 minutes.
+
+**Commits:** see the branch `feat/sm-005-startup`; docs: this entry.
+
+**Where:** Dev — done. App — after the owner merges `feat/sm-002-panel` … `feat/sm-005-startup` in order.
+
+---
+
 ## SM-004 — Encrypted store for account access (14 Nov 2026)
 
 **Tracker:** #17.
