@@ -23,6 +23,9 @@ return [
 
     'display_timezone' => 'Asia/Kolkata',
 
+    // The owner's photos and videos (read only, never changed): Test send picks from here, the library later.
+    'library_source' => env('SMM_LIBRARY_SOURCE', 'D:\\Pravin\\Moggi\\Markting Social Media'),
+
     // Meta's Graph API (Facebook Page and Instagram). v27.0 was the newest version on 19 Nov 2026.
     'meta' => [
         'graph_version' => 'v27.0',
