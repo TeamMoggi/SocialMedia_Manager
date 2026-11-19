@@ -184,7 +184,8 @@ Public Facebook posts need the Meta app in **Live** mode, and in Live mode Meta 
   1. Add the Page and the Instagram account.
   2. Create a system user.
   3. Give that system user:
-     - the Page and Instagram, limited to content, community activity and insights (no ads, no messages, no full control)
+     - the Page with **full control** (changed 19 Nov 2026: the Test send showed Meta lets only admin-level access upload Page videos, error 200 "sufficient administrative permission"; the owner chose full control over Reels-only)
+     - Instagram, limited to content, community activity and insights (no ads, no messages, no full control)
      - the Meta app
 - **Owner, during part 1, once the app's Meta screen exists:**
   1. Switch the Meta app to **Live**. The privacy policy is https://moggiesinternational.com/privacy-policy/. Anything else Meta asks for at that moment, such as a data-deletion address or an icon, is handled then. If the privacy page needs new wording, it goes through the website's own branch-and-merge routine.
