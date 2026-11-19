@@ -97,6 +97,25 @@ class MetaTestPostTest extends TestCase
         $this->assertNull(Setting::get('meta.test_post'));
     }
 
+    public function test_post_is_tracked_even_if_reading_it_back_fails(): void
+    {
+        $this->live();
+        Http::fake(function (Request $r) {
+            $path = (string) parse_url($r->url(), PHP_URL_PATH);
+
+            return $r->method() === 'POST' && str_ends_with($path, '/1510742765451658/feed')
+                ? Http::response(['id' => self::POST_ID])
+                : Http::response(['error' => ['message' => 'An unknown error occurred', 'code' => 1]], 500);
+        });
+
+        $this->artisan('smm:meta:test-post')
+            ->expectsOutputToContain('Test post made')
+            ->assertExitCode(0);
+
+        $this->assertSame(self::POST_ID, Setting::get('meta.test_post')['id']);
+        $this->assertSame(1, $this->feedPosts());
+    }
+
     public function test_cleanup_without_a_test_post_is_silent(): void
     {
         Http::fake();

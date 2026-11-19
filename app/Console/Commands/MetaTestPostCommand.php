@@ -51,24 +51,31 @@ class MetaTestPostCommand extends Command
         $ref = bin2hex(random_bytes(3));
         $now = CarbonImmutable::now($page->brand->timezone ?? config('smm.display_timezone'));
         try {
-            $id = (string) $graph->post("{$page->external_id}/feed", [
+            $id = (string) ($graph->post("{$page->external_id}/feed", [
                 'message' => "Test from SocialMedia Manager, {$now->format('j M Y, H:i T')} (ref {$ref}). It will be deleted in a few minutes.",
-            ], $page->access_token)['id'];
-            $post = $graph->get($id, ['fields' => 'permalink_url,is_published'], $page->access_token);
+            ], $page->access_token)['id'] ?? '');
         } catch (MetaError $e) {
             $this->error('The test post was not made: '.$e->plain());
 
             return self::FAILURE;
         }
+        if ($id === '') {
+            $this->error("Facebook gave no id for the test post: look for ref {$ref} on the Page and delete it by hand.");
 
-        Setting::put(self::SETTING, [
-            'id' => $id,
-            'account_id' => $page->id,
-            'permalink' => $post['permalink_url'] ?? null,
-            'ref' => $ref,
-            'created_at' => CarbonImmutable::now('UTC')->toIso8601String(),
-        ]);
-        $this->info('Test post made: '.($post['permalink_url'] ?? $id));
+            return self::FAILURE;
+        }
+
+        // Remember it straight away, so --delete and the daily clean-up can always find it.
+        $saved = ['id' => $id, 'account_id' => $page->id, 'permalink' => null, 'ref' => $ref, 'created_at' => CarbonImmutable::now('UTC')->toIso8601String()];
+        Setting::put(self::SETTING, $saved);
+
+        try {
+            $saved['permalink'] = $graph->get($id, ['fields' => 'permalink_url,is_published'], $page->access_token)['permalink_url'] ?? null;
+            Setting::put(self::SETTING, $saved);
+        } catch (MetaError $e) {
+            $this->warn('Made, but could not read its link: '.$e->plain());
+        }
+        $this->info('Test post made: '.($saved['permalink'] ?? $id));
         $this->line("Reference to look for: {$ref}. Delete it within 10 minutes: php artisan smm:meta:test-post --delete");
 
         return self::SUCCESS;
