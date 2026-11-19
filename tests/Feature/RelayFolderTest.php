@@ -86,6 +86,49 @@ class RelayFolderTest extends TestCase
         }
     }
 
+    public function test_failed_upload_leaves_nothing_behind(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'smm');
+        $photo = $file.'.jpg';
+        rename($file, $photo);
+        $disk = \Mockery::mock(Filesystem::class);
+        $disk->shouldReceive('writeStream')->once()->andThrow(new \RuntimeException('Connection lost during upload'));
+        $disk->shouldReceive('delete')->once()->with(\Mockery::pattern('/^[0-9a-f]{32}\.jpg$/'));
+
+        try {
+            (new RelayFolder($disk, self::BASE))->put($photo);
+            $this->fail('A failed upload was reported as done.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Connection lost', $e->getMessage());
+        } finally {
+            @unlink($photo);
+        }
+    }
+
+    public function test_sweep_removes_old_leftovers_but_keeps_the_lock_and_new_files(): void
+    {
+        $this->disk->put('.htaccess', 'lock');
+        $this->disk->put('old.jpg', 'x');
+        $this->disk->put('new.mp4', 'y');
+        touch($this->disk->path('old.jpg'), time() - 3 * 3600);
+        touch($this->disk->path('.htaccess'), time() - 30 * 86400);
+
+        $this->assertSame(1, $this->relay->sweep());
+
+        $this->assertEqualsCanonicalizing(['.htaccess', 'new.mp4'], $this->disk->allFiles());
+    }
+
+    public function test_daily_jobs_sweep_the_folder(): void
+    {
+        app()->instance(RelayFolder::class, $this->relay);
+        $this->disk->put('left-over.mp4', 'x');
+        touch($this->disk->path('left-over.mp4'), time() - 5 * 3600);
+
+        $this->artisan('smm:daily')->assertExitCode(0);
+
+        $this->assertSame([], $this->disk->allFiles());
+    }
+
     public function test_folder_test_passes_and_leaves_only_the_lock_file(): void
     {
         $this->fakeWebsite();

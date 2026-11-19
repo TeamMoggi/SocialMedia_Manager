@@ -84,6 +84,14 @@ final class RelayFolder
             if ($this->disk->writeStream($name, $handle) === false) {
                 throw new RuntimeException('The upload to the Hostinger folder did not finish.');
             }
+        } catch (Throwable $e) {
+            // A half-finished upload must not stay in the folder.
+            try {
+                $this->disk->delete($name);
+            } catch (Throwable) {
+                // The daily sweep removes it if this fails too.
+            }
+            throw $e;
         } finally {
             if (is_resource($handle)) {
                 fclose($handle);
@@ -91,6 +99,31 @@ final class RelayFolder
         }
 
         return ['name' => $name, 'url' => $this->url($name)];
+    }
+
+    /**
+     * Deletes leftovers (anything but the lock file) older than $hours: files from a crash, a power cut
+     * or an interrupted upload. Returns how many were removed.
+     */
+    public function sweep(int $hours = 2): int
+    {
+        $cutoff = time() - $hours * 3600;
+        $removed = 0;
+        foreach ($this->disk->files() as $name) {
+            if ($name === '.htaccess') {
+                continue;
+            }
+            try {
+                if ($this->disk->lastModified($name) <= $cutoff) {
+                    $this->disk->delete($name);
+                    $removed++;
+                }
+            } catch (Throwable) {
+                // Left for the next sweep.
+            }
+        }
+
+        return $removed;
     }
 
     public function delete(string $name): void
@@ -127,7 +160,8 @@ final class RelayFolder
 
         try {
             $this->ensureHtaccess();
-            $steps[] = ['label' => $label, 'ok' => true, 'note' => null];
+            $swept = $this->sweep();
+            $steps[] = ['label' => $label, 'ok' => true, 'note' => $swept > 0 ? "Removed {$swept} old file(s) left from earlier." : null];
 
             $label = 'Upload a test file';
             $name = bin2hex(random_bytes(16)).'.txt';

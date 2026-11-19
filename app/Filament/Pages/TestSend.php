@@ -60,7 +60,8 @@ class TestSend extends Page
 
                         return;
                     }
-                    set_time_limit(900);
+                    // No time limit: on Windows it counts waiting too, and a stop in the middle would skip the clean-up.
+                    set_time_limit(0);
                     /** @var Brand $brand */
                     $brand = Filament::getTenant();
                     $result = (new Rehearsal(app(MetaGraph::class), app(RelayFolder::class)))
