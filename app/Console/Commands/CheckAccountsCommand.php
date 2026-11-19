@@ -12,6 +12,7 @@ use App\Models\ConnectedAccount;
 use Carbon\CarbonImmutable;
 use Filament\Notifications\Notification;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 
 class CheckAccountsCommand extends Command
 {
@@ -67,7 +68,7 @@ class CheckAccountsCommand extends Command
             }
             $check = $meta->checkKey($brand);
             if ($check->unreachable) {
-                $this->line('Meta key: could not check (no connection).');
+                $this->line("Meta key: could not check now ({$check->problem}). Nothing changed.");
 
                 return;
             }
@@ -77,7 +78,14 @@ class CheckAccountsCommand extends Command
                 ?? ($check->missing !== [] ? 'The Meta key is missing: '.implode(', ', $check->missing).'. Make a new key and tick these.' : null);
 
             if ($problem === null) {
-                $accounts->each(fn (ConnectedAccount $a) => $a->update(['token_expires_at' => $check->expiresAt]));
+                // A working key also clears a "Problem" that an earlier key check set (and only that one).
+                $accounts->each(function (ConnectedAccount $a) use ($check): void {
+                    $changes = ['token_expires_at' => $check->expiresAt];
+                    if ($a->status === AccountStatus::Error && ($a->meta['error_from'] ?? null) === 'meta_key') {
+                        $changes += ['status' => AccountStatus::Connected, 'last_error' => null, 'meta' => Arr::except($a->meta ?? [], 'error_from')];
+                    }
+                    $a->update($changes);
+                });
                 $this->line('Meta key: works.');
 
                 return;
@@ -85,7 +93,11 @@ class CheckAccountsCommand extends Command
 
             $problem = str_contains($problem, 'Make a new key') ? $problem : $problem.' Make a new key and save it on the Meta page.';
             $newlyBroken = $accounts->filter(fn (ConnectedAccount $a): bool => $a->status !== AccountStatus::Error);
-            $accounts->each(fn (ConnectedAccount $a) => $a->update(['status' => AccountStatus::Error, 'last_error' => $problem]));
+            $accounts->each(fn (ConnectedAccount $a) => $a->update([
+                'status' => AccountStatus::Error,
+                'last_error' => $problem,
+                'meta' => ['error_from' => 'meta_key'] + ($a->meta ?? []),
+            ]));
             $this->line("Meta key: {$problem}");
 
             if ($newlyBroken->isNotEmpty()) {

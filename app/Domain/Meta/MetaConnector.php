@@ -27,7 +27,10 @@ final class MetaConnector
     public function checkKey(Brand $brand): KeyCheck
     {
         $check = $this->askMeta($brand);
-        Setting::put("meta.key_check.{$brand->id}", $check->toArray());
+        // No answer from Meta says nothing about the key: keep the last real check on the Meta page.
+        if (! $check->unreachable) {
+            Setting::put("meta.key_check.{$brand->id}", $check->toArray());
+        }
 
         return $check;
     }
@@ -140,7 +143,8 @@ final class MetaConnector
         try {
             $data = $this->graph->get('debug_token', ['input_token' => $key], MetaCredentials::appId().'|'.$secret)['data'] ?? [];
         } catch (MetaError $e) {
-            return $e->transient() && $e->code() === 0
+            // No connection, Meta's own temporary trouble or its hourly limit: nothing is known about the key.
+            return $e->transient()
                 ? KeyCheck::failed($e->plain(), unreachable: true)
                 : KeyCheck::failed($e->plain());
         }
