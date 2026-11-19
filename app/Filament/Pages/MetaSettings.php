@@ -52,10 +52,8 @@ class MetaSettings extends Page
                             }
                         }]),
                 ])
-                ->action(function (array $data): void {
-                    MetaCredentials::saveKey($this->brand(), $data['key']);
-                    $this->connectAndReport();
-                }),
+                // The key is saved only once Meta accepts it, so a mistyped key never replaces a working one.
+                ->action(fn (array $data) => $this->connectAndReport($data['key'])),
             Action::make('saveAppSecret')
                 ->label(fn (): string => MetaCredentials::appSecret() ? 'Change App Secret' : 'Save App Secret')
                 ->color('gray')
@@ -86,9 +84,9 @@ class MetaSettings extends Page
         ];
     }
 
-    private function connectAndReport(): void
+    private function connectAndReport(#[\SensitiveParameter] ?string $newKey = null): void
     {
-        $result = app(MetaConnector::class)->connect($this->brand());
+        $result = app(MetaConnector::class)->connect($this->brand(), $newKey);
 
         if ($result['problems'] !== []) {
             Notification::make()->title('Not connected')->body(implode("\n", $result['problems']))->danger()->persistent()->send();

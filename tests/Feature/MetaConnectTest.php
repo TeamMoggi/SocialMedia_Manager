@@ -12,6 +12,7 @@ use App\Models\ConnectedAccount;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
@@ -155,6 +156,52 @@ class MetaConnectTest extends TestCase
 
         $this->assertStringContainsString('not valid', implode(' ', $result['problems']));
         $this->assertSame(0, ConnectedAccount::count());
+    }
+
+    public function test_garbled_key_is_reported_as_not_valid(): void
+    {
+        $this->saveCredentials();
+        $this->fakeMeta(debug: ['is_valid' => false, 'app_id' => null]);
+
+        $problems = implode(' ', $this->connect()['problems']);
+
+        $this->assertStringContainsString('not valid', $problems);
+        $this->assertStringNotContainsString('different Meta app', $problems);
+    }
+
+    public function test_wrong_app_secret_is_reported_as_such(): void
+    {
+        $this->saveCredentials();
+        Http::fake(['graph.facebook.com/v27.0/debug_token*' => Http::response(['error' => ['message' => 'Invalid OAuth access token signature.', 'code' => 190]], 400)]);
+
+        $problems = implode(' ', $this->connect()['problems']);
+
+        $this->assertStringContainsString('App Secret', $problems);
+        $this->assertStringNotContainsString('make a new key', strtolower($problems));
+    }
+
+    public function test_rejected_new_key_keeps_the_working_key(): void
+    {
+        $this->saveCredentials();
+        $good = ['app_id' => '2181731786035384', 'is_valid' => true, 'expires_at' => 0, 'scopes' => [...MetaConnector::REQUIRED, ...MetaConnector::WANTED]];
+        Http::fake(function (Request $r) use ($good) {
+            parse_str((string) parse_url($r->url(), PHP_URL_QUERY), $q);
+            if (str_contains($r->url(), '/debug_token')) {
+                return Http::response(['data' => ($q['input_token'] ?? '') === 'EAAkey123' ? $good : ['app_id' => '2181731786035384', 'is_valid' => false]]);
+            }
+
+            return Http::response(['data' => [['id' => '1510742765451658', 'name' => 'Moggies International', 'access_token' => 'page-tok',
+                'instagram_business_account' => ['id' => '17841470732347612', 'username' => 'moggies_international']]]]);
+        });
+        $this->connect();
+
+        Livewire::test(MetaSettings::class)
+            ->callAction('saveKey', data: ['key' => 'EAAtypo'])
+            ->assertHasNoActionErrors();
+
+        $this->assertSame('EAAkey123', MetaCredentials::key($this->brand));
+        $this->assertSame([AccountStatus::Connected, AccountStatus::Connected], ConnectedAccount::all()->pluck('status')->all());
+        $this->assertTrue(MetaConnector::lastCheck($this->brand)->valid);
     }
 
     public function test_key_that_sees_no_page_is_explained(): void

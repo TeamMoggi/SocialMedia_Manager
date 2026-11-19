@@ -57,6 +57,18 @@ class MetaKeyDailyCheckTest extends TestCase
         $this->assertStringContainsString('Meta key stopped working', json_encode($this->owner()->notifications()->first()->data));
     }
 
+    public function test_wrong_app_secret_is_not_blamed_on_the_key(): void
+    {
+        $this->connectedMeta();
+        Http::fake(['graph.facebook.com/*' => Http::response(['error' => ['message' => 'Invalid OAuth access token signature.', 'code' => 190]], 400)]);
+
+        $this->artisan('smm:check-accounts')->assertExitCode(0);
+
+        $error = ConnectedAccount::firstOrFail()->last_error;
+        $this->assertStringContainsString('App Secret', $error);
+        $this->assertStringNotContainsString('Make a new key', $error);
+    }
+
     public function test_offline_check_changes_nothing(): void
     {
         $this->connectedMeta();

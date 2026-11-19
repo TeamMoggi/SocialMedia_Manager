@@ -26,7 +26,8 @@ final class MetaConnector
 
     public function checkKey(Brand $brand): KeyCheck
     {
-        $check = $this->askMeta($brand);
+        $key = MetaCredentials::key($brand);
+        $check = $key === null ? KeyCheck::failed('No Meta key is saved yet.') : $this->askMeta($key);
         // No answer from Meta says nothing about the key: keep the last real check on the Meta page.
         if (! $check->unreachable) {
             Setting::put("meta.key_check.{$brand->id}", $check->toArray());
@@ -42,28 +43,40 @@ final class MetaConnector
         return is_array($saved) ? KeyCheck::fromArray($saved) : null;
     }
 
-    /** @return array{page: ?ConnectedAccount, instagram: ?ConnectedAccount, problems: list<string>, warnings: list<string>} */
-    public function connect(Brand $brand): array
+    /**
+     * Connects with the saved key, or with $newKey: a new key is saved only once Meta accepts it, so a
+     * mistyped key never replaces a working one.
+     *
+     * @return array{page: ?ConnectedAccount, instagram: ?ConnectedAccount, problems: list<string>, warnings: list<string>}
+     */
+    public function connect(Brand $brand, #[\SensitiveParameter] ?string $newKey = null): array
     {
         $result = ['page' => null, 'instagram' => null, 'problems' => [], 'warnings' => []];
-        $key = MetaCredentials::key($brand);
-        if ($key === null) {
+        $key = $newKey !== null ? MetaCredentials::clean($newKey) : MetaCredentials::key($brand);
+        if ($key === null || $key === '') {
             $result['problems'][] = 'No Meta key is saved yet.';
 
             return $result;
         }
 
-        $check = $this->checkKey($brand);
-        if ($check->problem !== null) {
-            $result['problems'][] = $check->problem;
+        $check = $this->askMeta($key);
+        $problem = $check->problem
+            ?? ($check->missing !== [] ? 'The key is missing: '.implode(', ', $check->missing).'. Make a new key and tick these.' : null);
+        if ($problem !== null) {
+            if ($newKey !== null && MetaCredentials::key($brand) !== null) {
+                $problem .= ' Your saved key was not changed.';
+            } elseif ($newKey === null && ! $check->unreachable) {
+                Setting::put("meta.key_check.{$brand->id}", $check->toArray());
+            }
+            $result['problems'][] = $problem;
 
             return $result;
         }
-        if ($check->missing !== []) {
-            $result['problems'][] = 'The key is missing: '.implode(', ', $check->missing).'. Make a new key and tick these.';
 
-            return $result;
+        if ($newKey !== null) {
+            MetaCredentials::saveKey($brand, $key);
         }
+        Setting::put("meta.key_check.{$brand->id}", $check->toArray());
         if ($check->extra !== []) {
             $result['warnings'][] = 'The key has more access than the app needs: '.implode(', ', $check->extra).'. Next time you make a key, leave these unticked.';
         }
@@ -129,13 +142,9 @@ final class MetaConnector
         return $result;
     }
 
-    private function askMeta(Brand $brand): KeyCheck
+    private function askMeta(#[\SensitiveParameter] string $key): KeyCheck
     {
-        $key = MetaCredentials::key($brand);
         $secret = MetaCredentials::appSecret();
-        if ($key === null) {
-            return KeyCheck::failed('No Meta key is saved yet.');
-        }
         if ($secret === null) {
             return KeyCheck::failed('Save the App Secret first.');
         }
@@ -144,16 +153,23 @@ final class MetaConnector
             $data = $this->graph->get('debug_token', ['input_token' => $key], MetaCredentials::appId().'|'.$secret)['data'] ?? [];
         } catch (MetaError $e) {
             // No connection, Meta's own temporary trouble or its hourly limit: nothing is known about the key.
-            return $e->transient()
-                ? KeyCheck::failed($e->plain(), unreachable: true)
+            if ($e->transient()) {
+                return KeyCheck::failed($e->plain(), unreachable: true);
+            }
+
+            // debug_token itself is called with the app's own token (App ID + App Secret), so an access
+            // error here is about those, not about the key.
+            return in_array($e->code(), [190, 101, 102], true)
+                ? KeyCheck::failed('Meta did not accept the App ID or App Secret: check App settings → Basic on developers.facebook.com and save the App Secret again.')
                 : KeyCheck::failed($e->plain());
         }
 
-        if ((string) ($data['app_id'] ?? '') !== MetaCredentials::appId()) {
-            return KeyCheck::failed("This key was made for a different Meta app. Make it for 'Moggies Social Manager'.");
-        }
         if (($data['is_valid'] ?? false) !== true) {
-            return KeyCheck::failed('Meta says this key is not valid. Make a new key.');
+            return KeyCheck::failed('Meta says this key is not valid (it may have been copied only in part, or removed). Make a new key.');
+        }
+        $appId = (string) ($data['app_id'] ?? '');
+        if ($appId !== '' && $appId !== MetaCredentials::appId()) {
+            return KeyCheck::failed("This key was made for a different Meta app. Make it for 'Moggies Social Manager'.");
         }
 
         $scopes = array_values(array_map('strval', $data['scopes'] ?? []));

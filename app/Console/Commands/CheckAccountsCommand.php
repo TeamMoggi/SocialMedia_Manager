@@ -91,7 +91,6 @@ class CheckAccountsCommand extends Command
                 return;
             }
 
-            $problem = str_contains($problem, 'Make a new key') ? $problem : $problem.' Make a new key and save it on the Meta page.';
             $newlyBroken = $accounts->filter(fn (ConnectedAccount $a): bool => $a->status !== AccountStatus::Error);
             $accounts->each(fn (ConnectedAccount $a) => $a->update([
                 'status' => AccountStatus::Error,

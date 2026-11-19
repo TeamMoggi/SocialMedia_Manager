@@ -51,7 +51,7 @@ final class MetaCredentials
     }
 
     /** Copying from Meta's dialog can bring spaces and line breaks along; keys and secrets never contain any. */
-    private static function clean(#[\SensitiveParameter] string $value): string
+    public static function clean(#[\SensitiveParameter] string $value): string
     {
         return (string) preg_replace('/\s+/', '', $value);
     }
