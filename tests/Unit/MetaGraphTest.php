@@ -2,9 +2,11 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Meta\MetaCredentials;
 use App\Domain\Meta\MetaError;
 use App\Domain\Meta\MetaGraph;
 use App\Domain\Meta\PublishBlocked;
+use App\Models\Setting;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -36,7 +38,26 @@ class MetaGraphTest extends TestCase
             'instagram publish' => ['17841470732347612/media_publish', ['creation_id' => '1']],
             'photo without published flag' => ['1/photos', []],
             'video published' => ['1/videos', ['published' => 'true']],
+            'scheduled photo' => ['1/photos', ['published' => false, 'scheduled_publish_time' => 1795100000]],
+            'scheduled video' => ['1/videos', ['published' => 'false', 'unpublished_content_type' => 'SCHEDULED']],
+            'publish an earlier upload' => ['1234567890', ['published' => true]],
+            'any other write' => ['1510742765451658/comments', ['message' => 'hi']],
         ];
+    }
+
+    public function test_secrets_are_hidden_from_stack_traces(): void
+    {
+        $sensitive = fn (string $class, string $method, string $param): bool => collect((new \ReflectionMethod($class, $method))->getParameters())
+            ->first(fn (\ReflectionParameter $p): bool => $p->getName() === $param)
+            ?->getAttributes(\SensitiveParameter::class) !== [];
+
+        foreach (['get', 'post', 'delete', 'upload'] as $method) {
+            $this->assertTrue($sensitive(MetaGraph::class, $method, 'token'), "MetaGraph::{$method} \$token");
+        }
+        $this->assertTrue($sensitive(MetaGraph::class, '__construct', 'appSecret'));
+        $this->assertTrue($sensitive(MetaCredentials::class, 'saveAppSecret', 'secret'));
+        $this->assertTrue($sensitive(MetaCredentials::class, 'saveKey', 'key'));
+        $this->assertTrue($sensitive(Setting::class, 'putSecret', 'value'));
     }
 
     #[DataProvider('publishingCalls')]

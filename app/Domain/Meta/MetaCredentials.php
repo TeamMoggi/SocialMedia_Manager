@@ -22,7 +22,7 @@ final class MetaCredentials
         return Setting::getSecret('meta.app_secret');
     }
 
-    public static function saveAppSecret(string $appId, string $secret): void
+    public static function saveAppSecret(string $appId, #[\SensitiveParameter] string $secret): void
     {
         Setting::put('meta.app_id', self::clean($appId));
         Setting::putSecret('meta.app_secret', self::clean($secret));
@@ -34,7 +34,7 @@ final class MetaCredentials
         return Setting::getSecret("meta.key.{$brand->id}");
     }
 
-    public static function saveKey(Brand $brand, string $key): void
+    public static function saveKey(Brand $brand, #[\SensitiveParameter] string $key): void
     {
         Setting::putSecret("meta.key.{$brand->id}", self::clean($key));
         Setting::put("meta.key_saved_at.{$brand->id}", CarbonImmutable::now('UTC')->toIso8601String());
@@ -51,7 +51,7 @@ final class MetaCredentials
     }
 
     /** Copying from Meta's dialog can bring spaces and line breaks along; keys and secrets never contain any. */
-    private static function clean(string $value): string
+    private static function clean(#[\SensitiveParameter] string $value): string
     {
         return (string) preg_replace('/\s+/', '', $value);
     }
