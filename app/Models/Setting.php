@@ -38,7 +38,7 @@ class Setting extends Model
         return $row === null || $row->value === null ? null : Crypt::decryptString($row->value);
     }
 
-    public static function putSecret(string $key, string $value): void
+    public static function putSecret(string $key, #[\SensitiveParameter] string $value): void
     {
         static::query()->updateOrCreate(['key' => $key], ['value' => Crypt::encryptString($value)]);
     }

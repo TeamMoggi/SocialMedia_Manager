@@ -13,8 +13,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 /**
- * The brand's connected social media accounts. Read-only for now: connecting comes with the
- * Facebook/Instagram and LinkedIn steps; here the owner sees each account's state and can disconnect it.
+ * The brand's connected social media accounts. Read-only: Facebook and Instagram are connected from the
+ * Meta page (permanent key); here the owner sees each account's state and can disconnect it.
  */
 class ConnectedAccountResource extends Resource
 {
@@ -53,7 +53,7 @@ class ConnectedAccountResource extends Resource
                     ->modalSubmitActionLabel('Disconnect'),
             ])
             ->emptyStateHeading('No accounts connected yet')
-            ->emptyStateDescription('Connecting the Facebook Page, Instagram and the LinkedIn company page comes in a later build step.');
+            ->emptyStateDescription('Save the Meta key on the Meta page to connect the Facebook Page and Instagram. The LinkedIn company page comes once LinkedIn approves access.');
     }
 
     public static function getPages(): array

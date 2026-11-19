@@ -23,5 +23,17 @@ return [
 
     'display_timezone' => 'Asia/Kolkata',
 
+    // The owner's photos and videos (read only, never changed): Test send picks from here, the library later.
+    'library_source' => env('SMM_LIBRARY_SOURCE', 'D:\\Pravin\\Moggi\\Markting Social Media'),
+
+    // Meta's Graph API (Facebook Page and Instagram). v27.0 was the newest version on 19 Nov 2026.
+    'meta' => [
+        'graph_version' => 'v27.0',
+        'graph_url' => 'https://graph.facebook.com',
+        'video_url' => 'https://graph-video.facebook.com',
+        // The Meta app "Moggies Social Manager" (developers.facebook.com).
+        'app_id' => '2181731786035384',
+    ],
+
     'required_extensions' => ['curl', 'fileinfo', 'ftp', 'gd', 'intl', 'mbstring', 'openssl', 'pdo_sqlite', 'sqlite3', 'sodium', 'zip'],
 ];

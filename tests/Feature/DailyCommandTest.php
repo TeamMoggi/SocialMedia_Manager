@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Meta\MetaGraph;
 use App\Enums\AccountStatus;
 use App\Enums\Network;
 use App\Models\Brand;
@@ -16,6 +17,20 @@ class DailyCommandTest extends TestCase
     use RefreshDatabase;
 
     protected bool $seed = true;
+
+    public function test_daily_runs_the_other_jobs_when_one_fails(): void
+    {
+        // Something unexpected in the Meta part must not stop the backup and the "daily jobs ran" record.
+        app()->bind(MetaGraph::class, fn () => throw new \RuntimeException('Unexpected Meta trouble'));
+
+        $this->artisan('smm:daily')
+            ->expectsOutputToContain('Unexpected Meta trouble')
+            ->expectsOutputToContain('Set a backup password in the app first')
+            ->assertExitCode(0);
+
+        $this->assertNotNull(Setting::get('heartbeat_at'));
+        $this->assertNotNull(Setting::get('last_backup_error'));
+    }
 
     public function test_daily_checks_accounts_and_records_heartbeat_even_without_backup_password(): void
     {
