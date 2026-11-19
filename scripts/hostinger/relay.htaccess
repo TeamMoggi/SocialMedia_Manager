@@ -1,0 +1,10 @@
+# SocialMedia Manager: Instagram relay folder (moggiesinternational.com).
+# Instagram downloads photos and videos from here; the app deletes each file right after use.
+# Nothing in this folder may be listed, indexed or run as a script.
+Options -Indexes -ExecCGI
+<IfModule mod_headers.c>
+Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+<FilesMatch "\.(php\d?|phtml|phar|cgi|pl|py|sh|htm|html|js|svg)$">
+Require all denied
+</FilesMatch>
