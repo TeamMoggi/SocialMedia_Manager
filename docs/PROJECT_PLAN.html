@@ -360,7 +360,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <div class="table-wrap"><table>
 <thead><tr><th>Account</th><th>What the app can do</th><th>What we need</th><th>Approval from the network</th></tr></thead>
 <tbody>
-<tr><td><b>Facebook Page</b></td><td>Posts (text, photo, video, link) with Facebook's own scheduling; insights; comments; followers by country and city</td><td>A Meta developer account, one Meta Business app, you as app admin and Page admin</td><td><span class="tag ok">Not needed</span> while only people with a role on the app use it (Development mode)</td></tr>
+<tr><td><b>Facebook Page</b></td><td>Posts (text, photo, video, link) with Facebook's own scheduling; insights; comments; followers by country and city</td><td>A Meta developer account, one Meta Business app, you as app admin and Page admin</td><td><span class="tag ok">Not needed</span> for our own Page and Instagram: the app goes Live with Standard Access, which needs no review (amended 19 Nov 2026)</td></tr>
 <tr><td><b>Instagram</b> moggies_international</td><td>Feed photos, carousels, Reels, Stories; insights; comments; followers by country, city, age and gender once the account has 100 followers</td><td>A Business account linked to the Facebook Page, the same Meta app, and the photo and video relay folder</td><td><span class="tag ok">Not needed</span> (same rule). Instagram caps API posts per account per day, far above our needs.</td></tr>
 <tr><td><b>LinkedIn company page</b> 145339181</td><td>Posts, follower and post statistics, followers by country/region, industry, job function, seniority and company size; comments</td><td>A separate LinkedIn developer app, verified by the company page, with a verified website</td><td><span class="tag warn">LinkedIn decides</span> (#9, #10). A Development tier comes first. The Standard tier must be applied for within 12 months (#41).</td></tr>
 <tr><td><b>LinkedIn profile</b> (optional)</td><td>Posts</td><td>"Share on LinkedIn", which is self-serve</td><td><span class="tag ok">Self-serve</span> (#40)</td></tr>
@@ -441,7 +441,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <tr><td class="id">13</td><td>Keep posting after the trial ends (about 29 Nov): Meta Business Suite for Facebook and Instagram, LinkedIn's own scheduler for the page, until the pilot (#26) passes</td><td>Owner</td><td>&mdash;</td></tr>
 <tr><td class="id">14</td><td><span class="tag ok">Decided 14 Nov</span> Second backup copy on <b>your USB drive</b>. You copy the Backups folder to it yourself, about once a week; the app reminds you after 7 days.</td><td>Owner</td><td>&mdash;</td></tr>
 
-<tr class="phase"><td colspan="4">Phase 1: Build and first posts (19 Nov &ndash; 6 Dec 2026)</td></tr>
+<tr class="phase"><td colspan="4">Phase 1: Build and first posts (23 Nov &ndash; 6 Dec 2026; pilot and posts on the websites to 20 Dec)</td></tr>
 <tr><td class="id">15</td><td>App skeleton: Filament screens with Moggies branding, opens only on this laptop, no login screen, brands from day one</td><td>Claude</td><td>4</td></tr>
 <tr><td class="id">16</td><td>Start with Windows, timed jobs every minute, and an "Update and start" file</td><td>Claude</td><td>15</td></tr>
 <tr><td class="id">17</td><td>Encrypted account store + Connected accounts screen per brand</td><td>Claude</td><td>15</td></tr>
@@ -478,7 +478,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <tr><td class="id">42</td><td>Hostinger subdomain, MySQL database, every-minute cron, SSL</td><td>Both</td><td>your decision</td></tr>
 <tr><td class="id">43</td><td>Login with a two-step check, team logins if wanted</td><td>Claude</td><td>42</td></tr>
 <tr><td class="id">44</td><td>Automatic deploy from GitHub, the same as moggies.in</td><td>Both</td><td>42</td></tr>
-<tr><td class="id">45</td><td>Move the data from the laptop to MySQL, and switch the photo relay to the app's own address</td><td>Claude</td><td>43, 44</td></tr>
+<tr><td class="id">45</td><td>Move the data from the laptop to MySQL, and switch the photo and video relay to the app's own address</td><td>Claude</td><td>43, 44</td></tr>
 <tr><td class="id">46</td><td>Meta App Review, only if other businesses will sign in themselves</td><td>Both</td><td>45</td></tr>
 </tbody></table></div>
 </section>
@@ -491,7 +491,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <thead><tr><th>Phase</th><th>When</th><th>Ends with</th></tr></thead>
 <tbody>
 <tr><td>0 Set up</td><td>16&ndash;22 Nov 2026</td><td>Tools installed, project and tracker ready, Meta app made. LinkedIn's review keeps running in the background.</td></tr>
-<tr><td>1 Build and first posts</td><td>19 Nov &ndash; 6 Dec 2026</td><td>Approved posts publish themselves on Facebook and Instagram, and on LinkedIn once approved</td></tr>
+<tr><td>1 Build and first posts</td><td>23 Nov &ndash; 6 Dec 2026 (pilot and posts on the websites to 20 Dec)</td><td>Approved posts publish themselves on Facebook and Instagram, and on LinkedIn once approved</td></tr>
 <tr><td>2 Analytics</td><td>21 Dec 2026 &ndash; 17 Jan 2027</td><td>Dashboard, audience breakdowns and monthly report, with history from 3 Oct</td></tr>
 <tr><td>3 Engage and grow</td><td>From late January 2027</td><td>Item by item, in the order you choose</td></tr>
 <tr><td>4 Go online</td><td>When you decide</td><td>The app on Hostinger with a login</td></tr>
