@@ -16,6 +16,8 @@ class DailyCommand extends Command
 
     public function handle(): int
     {
+        // A Facebook test post that was not deleted by hand goes now (SM-008).
+        $this->call('smm:meta:test-post', ['--cleanup' => true]);
         $this->call('smm:check-accounts');
         // A backup problem (for example no password yet) is shown on the Backups page; the other jobs go on.
         $this->call('smm:backup', ['--if-older-than' => 20]);
