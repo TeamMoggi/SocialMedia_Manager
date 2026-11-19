@@ -112,6 +112,23 @@ class MetaGraphTest extends TestCase
         }
     }
 
+    public function test_too_little_page_access_is_named_as_page_access_not_a_key_permission(): void
+    {
+        // Meta's answer on 19 Nov 2026 when the system user had only partial access to the Page.
+        $error = MetaError::fromResponse(['message' => '(#200) User does not have sufficient administrative permission for this action on this page. If the page business requires Two Factor Authentication, the user also needs to enable Two Factor Authentication.', 'type' => 'OAuthException', 'code' => 200], 400);
+
+        $this->assertStringContainsString('full control', $error->plain());
+        $this->assertStringContainsString('Moggies SMM App', $error->plain());
+        $this->assertStringNotContainsString('missing a permission', $error->plain());
+    }
+
+    public function test_a_missing_key_permission_is_still_named_as_one(): void
+    {
+        $error = MetaError::fromResponse(['message' => '(#200) Requires pages_manage_posts permission to manage the object', 'code' => 200], 403);
+
+        $this->assertStringContainsString('missing a permission', $error->plain());
+    }
+
     public function test_connection_failure_is_transient(): void
     {
         Http::fake(fn () => throw new ConnectionException('cURL error 6: Could not resolve host graph.facebook.com?access_token=tok-secret-123'));

@@ -69,6 +69,8 @@ class MetaError extends RuntimeException
         return match (true) {
             $code === 0 && $this->isTransient => 'Could not reach Meta: no internet connection. Try again when the laptop is online.',
             $code === 190 => 'The Meta key no longer works: make a new key (How to use → Meta key) and save it on the Meta page.',
+            // Too little access to the Page itself (Facebook videos need admin-level access), not the key.
+            $code === 200 && str_contains($this->getMessage(), 'administrative permission') => 'Meta refused: the system user Moggies SMM App needs full control of the Facebook Page for this (Business settings → System users → Moggies SMM App → Manage on the Page). The key is fine.',
             $code === 10 || ($code >= 200 && $code <= 299) => 'Meta refused: the key is missing a permission. Check the Meta page.',
             in_array($code, [4, 17, 32, 613], true) => "Meta's hourly limit was reached: try again in an hour.",
             in_array($code, [1, 2], true) => 'Meta had a temporary problem: try again in a few minutes.',
