@@ -4,6 +4,28 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-008 — Connect Facebook and Instagram, Hostinger folder, Test send (19 Nov 2026)
+
+**Tracker:** #18 (connect Facebook and Instagram), #11 (Hostinger folder). Part 1 of the next build (design `docs/superpowers/specs/2026-11-18-phase1-posting-design.md`, approved 19 Nov 2026; plan `docs/superpowers/plans/2026-11-19-sm-008-meta-connect.md`; build notes `…-sm-008-decisions.md`).
+
+**What changed**
+- **Meta (Facebook & Instagram)** page: you type the App Secret and the **permanent Meta key** (system user "Moggies SMM App", never expires). The app checks the key with Meta (right app, valid, permissions) and connects the Page **Moggies International** and **@moggies_international** by itself. Secrets are stored locked and shown only as "Saved on <date>".
+- **Daily key check** at 09:00: if the key stops working, Facebook and Instagram show "Problem: reconnect" with one message under the bell; no internet means no change.
+- **Hostinger folder** page: the FTP details of the hidden folder Instagram downloads from (password locked, never shown) and **Test the folder** (lock file, upload, download, can't be listed, delete, gone).
+- **Test send** page (and `smm:meta:rehearse`): one photo and one video from Markting Social Media go through every step to Instagram (up to a prepared post) and Facebook (unpublished upload, read back, deleted). **Nothing is published**; every uploaded file is removed.
+- **Safety:** every Meta call that would publish is refused before it is sent unless the copy is App in live mode, so Dev can never post. `smm:meta:test-post` (App only) makes the one agreed visible Facebook test post and deletes it.
+- **Wake-up trial** (`scripts/windows/wake-trial.ps1`): without an admin prompt the app may create a one-time wake task (yes) but not change the Daily task (no); the task ran on time. Wake timers are "important only" plugged in and off on battery, so the sleep test runs with you.
+- Project plan amended to v1.1 (6 Dec target, photos and videos through the relay, library reads Markting Social Media in place, permanent key).
+
+**Checks**
+- 111 tests pass, including: Dev refuses every publishing call before any request; secrets never appear on screen or in the database unencrypted; pasted keys with spaces or line breaks are cleaned; a key for another app, an invalid key, missing permissions, no Page, a Page without Instagram are each explained; a new key updates the accounts in place; the folder test leaves only the lock file, fails without the "noindex" header or when the folder can be listed, and treats a cached copy as a note; Test send never calls publish (also in live mode) and cleans up after an Instagram error or a failed Facebook read; file names with spaces, "!", "&" and Hindi letters work; no test can reach Meta or the website for real.
+
+**Commits:** branch `feat/sm-008-meta-connect`.
+
+**Where:** Dev — built; the setup with you (Meta key, Hostinger folder, Test send against the real accounts) comes next. App — after you merge the pull request.
+
+---
+
 ## SM-007 — Runs only when needed (14 Nov 2026)
 
 **Tracker:** #16 (changed at the owner's request: "keeping the app running every time will hamper my system").

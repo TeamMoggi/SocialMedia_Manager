@@ -101,11 +101,19 @@ a{color:var(--brand)}
 <header class="top">
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="brandname">Moggies International<small>SocialMedia_Manager &middot; project plan</small></div>
-  <div class="docmeta">Version 1.0 &middot; 14 November 2026<br><span class="tag ok">Approved by the owner, 14 Nov 2026</span></div>
+  <div class="docmeta">Version 1.1 &middot; 19 November 2026<br><span class="tag ok">Approved by the owner, 14 Nov 2026</span> <span class="tag ok">Amended 19 Nov 2026</span></div>
 </header>
 
 <h1>SocialMedia_Manager: project plan</h1>
 <p class="lede">Our own app to plan, approve, publish and measure posts on <b>Instagram, Facebook and LinkedIn</b>, covering the parts of Metricool we use. It runs on your laptop first, keeps the code backed up on GitHub, and can move to Hostinger with a login later. It is built with Laravel, using the same working routine as moggies.in.</p>
+
+<div class="note ok"><b>Amended 19 Nov 2026 (v1.1)</b> by the approved design for the next build (<code>docs/superpowers/specs/2026-11-18-phase1-posting-design.md</code>):
+<ul class="tight">
+  <li><b>First milestone:</b> everything ready by <b>6 December 2026</b>; the first real post on Fri 4 Dec (was 20 Dec).</li>
+  <li><b>Hostinger relay:</b> carries photos <b>and videos</b> for Instagram.</li>
+  <li><b>Media library:</b> reads your <b>Markting Social Media</b> folder where it is and never changes it; only files used in posts are copied into the app.</li>
+  <li><b>Meta access:</b> a permanent key from Meta's business settings (system user) instead of a Facebook sign-in button; the Meta app goes Live so posts are public.</li>
+</ul></div>
 
 <div class="note ok"><b>What you decided (14 Nov 2026)</b>
 <ul class="tight">
@@ -152,7 +160,7 @@ a{color:var(--brand)}
   <div class="card"><div class="k">Who uses it</div>You, on this laptop, with no login screen. Claude builds it. A login comes when it moves online.</div>
   <div class="card rec"><div class="k">Build</div>Laravel + Filament (PHP), with a single-file database. All tools are free and all go on the D: drive.</div>
   <div class="card"><div class="k">Phases</div>0&nbsp;Set up &rarr; 1&nbsp;Build and first posts &rarr; 2&nbsp;Analytics &rarr; 3&nbsp;Engage and grow &rarr; 4&nbsp;Go online (when you decide).</div>
-  <div class="card"><div class="k">First milestone</div>Approved posts publish themselves on Facebook and Instagram, target 20 December 2026. LinkedIn follows when LinkedIn approves our access.</div>
+  <div class="card"><div class="k">First milestone</div>Approved posts publish themselves on Facebook and Instagram, ready by 6 December 2026 (first real post Fri 4 Dec). LinkedIn follows when LinkedIn approves our access.</div>
 </div>
 </section>
 
@@ -271,8 +279,8 @@ a{color:var(--brand)}
 <tr><td>Calendar</td><td>FullCalendar, added as a Filament plugin or directly</td><td>Week and month views, drag to move</td><td>Free</td></tr>
 <tr><td>Database</td><td>SQLite: one file in the Data folder</td><td>No database server to run. MySQL on Hostinger later.</td><td>Free</td></tr>
 <tr><td>Running it</td><td>PHP's small web server on <code>127.0.0.1</code>, plus Windows Task Scheduler</td><td>Changed 14 Nov 2026 (SM-007): starts from a desktop shortcut and stops after 30 minutes without use; daily jobs once a day at 09:00; posts will wake it only at their times</td><td>Built in</td></tr>
-<tr><td>Instagram photo relay</td><td>Laravel's FTP storage, pointed at a hidden folder on your Hostinger site</td><td>Instagram downloads the photo from there; the app deletes it straight after</td><td>Existing hosting</td></tr>
-<tr><td>Network APIs</td><td>Meta Graph API (Facebook Page + Instagram through Facebook Login), LinkedIn Community Management API</td><td>Official routes only</td><td>Free</td></tr>
+<tr><td>Instagram photo and video relay</td><td>Laravel's FTP storage, pointed at a hidden folder on your Hostinger site</td><td>Instagram downloads the photo or video from there; the app deletes it straight after</td><td>Existing hosting</td></tr>
+<tr><td>Network APIs</td><td>Meta Graph API (Facebook Page + Instagram, with a permanent Meta key from a system user), LinkedIn Community Management API</td><td>Official routes only</td><td>Free</td></tr>
 <tr><td>Code backup and reviews</td><td>Git + private GitHub repo <code>TeamMoggi/SocialMedia_Manager</code></td><td>Branch &rarr; pull request &rarr; you merge</td><td>Free</td></tr>
 <tr><td>Data backup</td><td>A nightly password-protected (AES) zip of the Data folder</td><td>Saved to the Backups folder; you copy that folder to your USB drive weekly</td><td>Free</td></tr>
 <tr><td>Tests</td><td>Laravel's built-in tests (PHPUnit) with faked network replies. Python Playwright with Edge for screen checks.</td><td>Tests never post for real</td><td>Free</td></tr>
@@ -321,7 +329,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
   <div class="row">
     <div class="box"><b>Meta Graph API</b>Facebook Page + Instagram</div>
     <div class="box"><b>LinkedIn API</b>Company page 145339181</div>
-    <div class="box"><b>Photo relay on Hostinger</b>A hidden folder on moggiesinternational.com that Instagram downloads from; files are deleted after use</div>
+    <div class="box"><b>Photo and video relay on Hostinger</b>A hidden folder on moggiesinternational.com that Instagram downloads from; files are deleted after use</div>
   </div>
   <div class="arrow">Code path: Dev &rarr; GitHub pull request &rarr; you merge &rarr; "Update and start" brings it into App</div>
 </div>
@@ -331,7 +339,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
   <li>You (or Claude, later) write the post once, pick the networks and add photos or video. The app checks each network's rules and shows a preview per network.</li>
   <li>The post waits for <b>approval</b>. You tick the brand-rules checklist (no real people's faces, AI people labelled, only approved figures and wording) and approve.</li>
   <li><b>Facebook:</b> the post is handed to Facebook straight away with its time, so it goes out even if the laptop is off.</li>
-  <li><b>Instagram:</b> at the set time the app copies the photo to the hidden relay folder, Instagram downloads it, the app publishes, and the copy is deleted.</li>
+  <li><b>Instagram:</b> at the set time the app copies the photo or video to the hidden relay folder, Instagram downloads it, the app publishes, and the copy is deleted.</li>
   <li><b>LinkedIn:</b> at the set time the app uploads the media and posts.</li>
   <li>The network returns the post's link and the post shows <b>Published</b>. If something fails, the app retries 3 times over about 15 minutes, then marks it <b>Failed</b> and shows a Windows pop-up with the reason.</li>
   <li>Every day the collector saves followers, reach, engagement and audience numbers.</li>
@@ -353,7 +361,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <thead><tr><th>Account</th><th>What the app can do</th><th>What we need</th><th>Approval from the network</th></tr></thead>
 <tbody>
 <tr><td><b>Facebook Page</b></td><td>Posts (text, photo, video, link) with Facebook's own scheduling; insights; comments; followers by country and city</td><td>A Meta developer account, one Meta Business app, you as app admin and Page admin</td><td><span class="tag ok">Not needed</span> while only people with a role on the app use it (Development mode)</td></tr>
-<tr><td><b>Instagram</b> moggies_international</td><td>Feed photos, carousels, Reels, Stories; insights; comments; followers by country, city, age and gender once the account has 100 followers</td><td>A Business account linked to the Facebook Page, the same Meta app, and the photo relay folder</td><td><span class="tag ok">Not needed</span> (same rule). Instagram caps API posts per account per day, far above our needs.</td></tr>
+<tr><td><b>Instagram</b> moggies_international</td><td>Feed photos, carousels, Reels, Stories; insights; comments; followers by country, city, age and gender once the account has 100 followers</td><td>A Business account linked to the Facebook Page, the same Meta app, and the photo and video relay folder</td><td><span class="tag ok">Not needed</span> (same rule). Instagram caps API posts per account per day, far above our needs.</td></tr>
 <tr><td><b>LinkedIn company page</b> 145339181</td><td>Posts, follower and post statistics, followers by country/region, industry, job function, seniority and company size; comments</td><td>A separate LinkedIn developer app, verified by the company page, with a verified website</td><td><span class="tag warn">LinkedIn decides</span> (#9, #10). A Development tier comes first. The Standard tier must be applied for within 12 months (#41).</td></tr>
 <tr><td><b>LinkedIn profile</b> (optional)</td><td>Posts</td><td>"Share on LinkedIn", which is self-serve</td><td><span class="tag ok">Self-serve</span> (#40)</td></tr>
 </tbody></table></div>
@@ -390,7 +398,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
   <li><b>Account access</b> (network tokens) is encrypted with the app key. The key lives in the Data folder and in the encrypted backups, never in GitHub.</li>
   <li><b>GitHub holds code only.</b> The Data folder sits outside the code folders, and a check in the routine stops data files from being committed.</li>
   <li><b>Backups</b> are password-protected zips (AES). You keep the password. Without it a backup can't be opened, by anyone.</li>
-  <li><b>Photo relay:</b> random file names, deleted right after Instagram downloads them. The folder can't be listed or indexed, and its FTP account can only reach that folder.</li>
+  <li><b>Photo and video relay:</b> random file names, deleted right after Instagram downloads them. The folder can't be listed or indexed, and its FTP account can only reach that folder.</li>
   <li>Only the minimum permissions are asked from Meta and LinkedIn, and the app reminds you before access expires.</li>
   <li>A short privacy policy for the app goes on moggiesinternational.com (#8), which Meta and LinkedIn ask for.</li>
 </ul>
@@ -428,18 +436,18 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <tr><td class="id">8</td><td>App privacy policy page on moggiesinternational.com (through the website's usual branch and merge)</td><td>Claude</td><td>1</td></tr>
 <tr><td class="id">9</td><td>LinkedIn developer app for the company page, and the application for Community Management API access</td><td>Both</td><td>1, 8</td></tr>
 <tr><td class="id">10</td><td><b>LinkedIn approves our access to the company page</b> (Development tier). LinkedIn decides; you watch the developer-portal email and answer its questions. If it's refused, the app prepares posts for you to paste.</td><td>LinkedIn / Owner</td><td>9</td></tr>
-<tr><td class="id">11</td><td>Photo relay: an FTP account on Hostinger locked to one hidden folder on moggiesinternational.com</td><td>Both</td><td>1</td></tr>
+<tr><td class="id">11</td><td>Photo and video relay: an FTP account on Hostinger locked to one hidden folder on moggiesinternational.com</td><td>Both</td><td>1</td></tr>
 <tr><td class="id">12</td><td><span class="tag ok">Done 14 Nov</span> Save the Metricool history before the trial ends</td><td>Claude</td><td>&mdash;</td></tr>
 <tr><td class="id">13</td><td>Keep posting after the trial ends (about 29 Nov): Meta Business Suite for Facebook and Instagram, LinkedIn's own scheduler for the page, until the pilot (#26) passes</td><td>Owner</td><td>&mdash;</td></tr>
 <tr><td class="id">14</td><td><span class="tag ok">Decided 14 Nov</span> Second backup copy on <b>your USB drive</b>. You copy the Backups folder to it yourself, about once a week; the app reminds you after 7 days.</td><td>Owner</td><td>&mdash;</td></tr>
 
-<tr class="phase"><td colspan="4">Phase 1: Build and first posts (23 Nov &ndash; 20 Dec 2026)</td></tr>
+<tr class="phase"><td colspan="4">Phase 1: Build and first posts (19 Nov &ndash; 6 Dec 2026)</td></tr>
 <tr><td class="id">15</td><td>App skeleton: Filament screens with Moggies branding, opens only on this laptop, no login screen, brands from day one</td><td>Claude</td><td>4</td></tr>
 <tr><td class="id">16</td><td>Start with Windows, timed jobs every minute, and an "Update and start" file</td><td>Claude</td><td>15</td></tr>
 <tr><td class="id">17</td><td>Encrypted account store + Connected accounts screen per brand</td><td>Claude</td><td>15</td></tr>
-<tr><td class="id">18</td><td>Connect the Facebook Page and Instagram</td><td>Claude</td><td>6, 7, 17</td></tr>
+<tr><td class="id">18</td><td>Connect the Facebook Page and Instagram (permanent Meta key)</td><td>Claude</td><td>6, 7, 17</td></tr>
 <tr><td class="id">19</td><td>Connect the LinkedIn company page</td><td>Claude</td><td>10, 17</td></tr>
-<tr><td class="id">20</td><td>Media library with per-network checks</td><td>Claude</td><td>15</td></tr>
+<tr><td class="id">20</td><td>Media library with per-network checks; reads the Markting Social Media folder where it is, read-only</td><td>Claude</td><td>15</td></tr>
 <tr><td class="id">21</td><td>Composer: one post, per-network versions, previews, counters</td><td>Claude</td><td>20</td></tr>
 <tr><td class="id">22</td><td>Approval step with the brand-rules checklist</td><td>Claude</td><td>21</td></tr>
 <tr><td class="id">23</td><td>Calendar (week and month), drag to reschedule</td><td>Claude</td><td>22</td></tr>
@@ -483,7 +491,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <thead><tr><th>Phase</th><th>When</th><th>Ends with</th></tr></thead>
 <tbody>
 <tr><td>0 Set up</td><td>16&ndash;22 Nov 2026</td><td>Tools installed, project and tracker ready, Meta app made. LinkedIn's review keeps running in the background.</td></tr>
-<tr><td>1 Build and first posts</td><td>23 Nov &ndash; 20 Dec 2026</td><td>Approved posts publish themselves on Facebook and Instagram, and on LinkedIn once approved</td></tr>
+<tr><td>1 Build and first posts</td><td>19 Nov &ndash; 6 Dec 2026</td><td>Approved posts publish themselves on Facebook and Instagram, and on LinkedIn once approved</td></tr>
 <tr><td>2 Analytics</td><td>21 Dec 2026 &ndash; 17 Jan 2027</td><td>Dashboard, audience breakdowns and monthly report, with history from 3 Oct</td></tr>
 <tr><td>3 Engage and grow</td><td>From late January 2027</td><td>Item by item, in the order you choose</td></tr>
 <tr><td>4 Go online</td><td>When you decide</td><td>The app on Hostinger with a login</td></tr>
@@ -493,7 +501,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <ul class="tight">
   <li><b>All tools</b> (PHP, Composer, Laravel, Filament, FullCalendar, SQLite, Git, GitHub private repo): free.</li>
   <li><b>Meta and LinkedIn APIs:</b> free.</li>
-  <li><b>Photo relay:</b> uses your existing Hostinger hosting.</li>
+  <li><b>Photo and video relay:</b> uses your existing Hostinger hosting.</li>
   <li><b>Claude API</b> (only if the AI helper is used): pay per use, small at 3&ndash;10 posts a week.</li>
   <li><b>Later, going online:</b> your existing Hostinger plan if it has room for one more site; otherwise a plan upgrade.</li>
 </ul>
@@ -510,7 +518,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 <tr><td>Backup password or app key lost</td><td>Backups can't be opened, or account access can't be read</td><td>You keep the password safe. Losing the key only means reconnecting the accounts.</td></tr>
 <tr><td>LinkedIn refuses or delays access</td><td>No automatic company-page posts or statistics</td><td>Apply in week one. The app prepares posts for you to paste until access comes.</td></tr>
 <tr><td>Meta or LinkedIn change their API, or access expires</td><td>Posts fail</td><td>Fixed API versions, reminders before expiry, a failure pop-up after retries</td></tr>
-<tr><td>Instagram can't download a photo from the relay</td><td>An Instagram post fails</td><td>Retries and a pop-up. The relay is tested in the pilot.</td></tr>
+<tr><td>Instagram can't download a photo or video from the relay</td><td>An Instagram post fails</td><td>Retries and a pop-up. The relay is checked with "Test the folder" and "Test send" before the first post, and again in the pilot.</td></tr>
 <tr><td>Some post features exist only in the phone apps</td><td>A few post types can't be automated</td><td>The composer says so and reminds you</td></tr>
 <tr><td>Small laptop memory (5.9 GB)</td><td>Slowness</td><td>The app uses about 100 MB, with no Node.js or Docker. Test browsers are closed after checks.</td></tr>
 <tr><td>Hand-built code with one maintainer</td><td>Hard to pick up later</td><td>Log, tracker, guide and tests, as on the websites</td></tr>
@@ -530,7 +538,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
   <li>Two copies of the code: App (yours, always the approved version) and Dev (Claude's, test data, dry-run posting). Data and Backups sit outside both.</li>
   <li>The app opens only on this laptop, with no login screen until it goes online.</li>
   <li>Missed posts never go out late without asking you. Facebook posts are handed to Facebook in advance.</li>
-  <li>The Instagram photo relay uses your existing moggiesinternational.com hosting.</li>
+  <li>The Instagram photo and video relay uses your existing moggiesinternational.com hosting.</li>
   <li>Alerts appear in the app and as Windows pop-ups for now; email comes when the app is online.</li>
   <li>The personal LinkedIn profile is left out for now (optional #40).</li>
   <li>Brands are built in from day one, with Moggies International first.</li>
@@ -554,7 +562,7 @@ D:\Tools\php, D:\Tools\composer   the two tools Laravel needs</pre>
 </section>
 
 <footer>
-  Moggies International &middot; SocialMedia_Manager project plan v1.0 &middot; 14 November 2026 &middot; Prepared with Claude as solution architect. Earlier drafts: v0.1 (WordPress, hosted) and v0.2 (local-first decision).
+  Moggies International &middot; SocialMedia_Manager project plan v1.1 &middot; 19 November 2026 (v1.0 approved 14 Nov 2026) &middot; Prepared with Claude as solution architect. Earlier drafts: v0.1 (WordPress, hosted) and v0.2 (local-first decision).
 </footer>
 
 </div>

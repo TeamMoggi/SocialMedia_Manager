@@ -1,6 +1,6 @@
 # Phase 1 posting: design (plan 2)
 
-**Date:** 18 Nov 2026 · **Status:** draft for the owner's approval
+**Date:** 18 Nov 2026 · **Status:** approved by the owner, 19 Nov 2026
 **Covers tracker tasks:** #11 (Hostinger folder), #18 (connect Facebook + Instagram), #20 (media library), #21 (composer), #22 (approval), #23 (calendar), #24 (publisher), and the start of #26 (pilot).
 **Amends `docs/PROJECT_PLAN.html` (v1.0):**
 - The first milestone moves from 20 Dec to **6 Dec 2026**.
@@ -99,7 +99,7 @@ The owner already works in `D:\Pravin\Moggi\Markting Social Media` and said "you
 - **No ffmpeg** on the laptop.
 
 ### Meta (set up 16 Nov 2026)
-- **App:** "Moggies Social Manager", App ID `2181731786035384`, **Development mode**. Only people with a role on the app can use it, so no App Review is needed. Keep it unpublished.
+- **App:** "Moggies Social Manager", App ID `2181731786035384`, **Development mode**. Only people with a role on the app can use it, so no App Review is needed. It goes Live in part 1 (see "Development mode hides posts" below).
 - **Use cases:** "Manage everything on your Page" and "Manage messaging & content on Instagram", set up with **Facebook Login**, which Meta now labels "legacy".
 - **Permissions ready:**
   - business_management, pages_show_list, public_profile

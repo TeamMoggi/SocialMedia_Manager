@@ -42,13 +42,13 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 14 November 2026<br>Up to SM-007</div>
+  <div class="meta">Updated 19 November 2026<br>Up to SM-008</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> the foundation is being built. The app runs on this laptop; posting comes in the next build plan. Until the pilot passes, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> the app can connect the Facebook Page and Instagram and test the whole route to them without publishing (<b>Test send</b>). Writing, approving and automatic posting come next, ready by 6 December 2026. Until the first real post (Fri 4 Dec) and the pilot pass, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
 
 <h2>What you will see</h2>
 <ul>
@@ -83,16 +83,42 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 </ul>
 
 <h2>Connected accounts</h2>
-<p>The <b>Connected accounts</b> page (left menu) lists the brand's Facebook Page, Instagram account and LinkedIn company page with their state. Connecting them comes in a later step.</p>
+<p>The <b>Connected accounts</b> page (left menu) lists the brand's Facebook Page, Instagram account and LinkedIn company page with their state. Facebook and Instagram are connected from the <b>Meta</b> page (below); LinkedIn comes once LinkedIn approves our access.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>State</th><th>What it means</th><th>What to do</th></tr></thead>
 <tbody>
 <tr><td>Connected</td><td>The app can post and read numbers.</td><td>Nothing.</td></tr>
 <tr><td>Access expires soon</td><td>The network's permission ends within 7 days.</td><td>Reconnect the account before the date shown.</td></tr>
 <tr><td>Access expired: reconnect</td><td>Posts to this account will fail.</td><td>Reconnect it.</td></tr>
-<tr><td>Problem: reconnect</td><td>The network refused the app (for example after a password change).</td><td>Reconnect it.</td></tr>
+<tr><td>Problem: reconnect</td><td>The network refused the app (for example the Meta key was removed or lost a permission). The "Last problem" column says why.</td><td>Facebook and Instagram: make a new Meta key and save it on the Meta page. LinkedIn: reconnect it.</td></tr>
 </tbody></table></div>
-<p>The app checks every day at 09:00 and puts a message under the bell when an account changes to "expires soon" or "expired". <b>Disconnect</b> makes the app forget its access to that account; posts already published stay online. The access is stored encrypted and is never shown on screen.</p>
+<p>The app checks every day at 09:00 (including whether the Meta key still works) and puts a message under the bell when an account changes to "expires soon", "expired" or "problem". If the laptop has no internet at that moment, nothing changes. <b>Disconnect</b> makes the app forget its access to that account; posts already published stay online. The access is stored encrypted and is never shown on screen.</p>
+
+<h2>Meta (Facebook &amp; Instagram): the permanent key</h2>
+<p>The app reaches the Facebook Page <b>Moggies International</b> and Instagram <b>@moggies_international</b> with a <b>permanent key</b> made in Meta's business settings for the system user <b>Moggies SMM App</b>. It does not expire, so there is no reconnecting every few months. Each copy of the app (App and Dev) has its own key.</p>
+<ol>
+<li><b>App Secret (once):</b> on developers.facebook.com open <b>Moggies Social Manager</b> &rarr; App settings &rarr; Basic &rarr; App Secret &rarr; Show. In the app open <b>Meta (Facebook &amp; Instagram)</b> &rarr; <b>Save App Secret</b> and paste it there.</li>
+<li><b>Make the key:</b> business.facebook.com/settings, portfolio <b>Moggies Social Manager</b> &rarr; Users &rarr; <b>System users</b> &rarr; <b>Moggies SMM App</b> &rarr; <b>Generate token</b>. Choose the app <b>Moggies Social Manager</b>, expiry <b>Never</b>, and tick only: pages_show_list, pages_read_engagement, pages_manage_posts, pages_manage_engagement, pages_read_user_content, read_insights, instagram_basic, instagram_content_publish, instagram_manage_insights, instagram_manage_comments, business_management. Nothing for ads or messages.</li>
+<li><b>Save it:</b> copy the key and press <b>Save Meta key</b> on the Meta page. The app checks it with Meta and connects the Page and Instagram by itself. The page then shows "works, never expires" and both accounts.</li>
+</ol>
+<div class="note warn"><b>Keep it secret:</b> the App Secret and the key can post as the business. Paste them only into the app, never into a chat, email or document. The app stores them locked and shows only "Saved on &lt;date&gt;". If one might have leaked, make a new key (and you can remove the old one in business settings).</div>
+<p>The page warns when the key is missing a permission the app needs (it then does not connect), lacks permissions needed later for statistics and comments, or has more access than needed. <b>Check the key now</b> asks Meta again.</p>
+
+<h2>Hostinger folder</h2>
+<p>Instagram only takes photos and videos from a web address, and this laptop has none. Just before an Instagram post the app puts the file in a <b>hidden folder on moggiesinternational.com</b> and deletes it straight after. The folder can't be listed or found by search engines, and its FTP account can reach nothing else on the website. Don't put other files in it.</p>
+<ul>
+<li><b>Setting it up</b> (once, with Claude, about 10 minutes): in hPanel &rarr; Files &rarr; FTP Accounts, make an account whose folder is the hidden folder Claude names. In the app open <b>Hostinger folder</b> &rarr; <b>Folder details</b> and type the server, user, password and the folder's public address. The password is stored locked and never shown; leave it empty later to keep it.</li>
+<li><b>Test the folder</b> checks everything in about 10 seconds: the lock file, upload, download from the website, that the folder can't be listed, delete, and that the file is gone. Each step shows &check; or &cross; with a plain note.</li>
+</ul>
+
+<h2>Test send</h2>
+<p><b>Test send</b> (left menu) takes one photo (.jpg) and one video (.mp4 or .mov) from your <b>Markting Social Media</b> folder through every step to Instagram and Facebook and <b>stops just before publishing: nothing is published</b>.</p>
+<ul>
+<li>Instagram: the file goes to the Hostinger folder, Instagram downloads and prepares it, then the file is removed.</li>
+<li>Facebook: the file is uploaded unpublished, checked, then deleted.</li>
+<li>It takes 1 to 3 minutes; keep the page open. The result lists every step with &check; or &cross;. Your files in Markting Social Media are only read, never changed.</li>
+<li>It works in both copies, because nothing becomes public. Real posts go out only from App.</li>
+</ul>
 
 <h2>Where everything lives</h2>
 <div class="table-wrap"><table>
@@ -126,6 +152,15 @@ php artisan smm:doctor</pre>
 <p>Installed from the App copy (one administrator prompt for the owner): the desktop shortcut (start.ps1 -Open) and the task <code>\SocialMediaManager\Daily</code> (daily 09:00, start when available, S4U, 1-hour limit, never wakes the laptop). It also removes the older Server and Tick tasks.</p>
 <pre>powershell -ExecutionPolicy Bypass -File .\scripts\windows\install-tasks.ps1</pre>
 <p>Other scripts in <code>scripts\windows</code>: <code>start.ps1 [-Open]</code>, <code>stop.ps1</code>, <code>daily.ps1</code> (one run of the daily jobs), <code>serve.ps1</code> (runs <code>php artisan smm:serve</code>, which stops after 30 minutes without use). Logs are in the data folder's <code>logs</code> folder.</p>
+
+<h2>For Claude: Meta and Hostinger commands</h2>
+<ul>
+<li><code>php artisan smm:meta:rehearse --photo="&lt;full path .jpg&gt;" --video="&lt;full path .mp4&gt;"</code>: the Test send from the command line; exit code 1 when a step fails. Never publishes, in any copy.</li>
+<li><code>php artisan smm:meta:test-post</code> (App only; Dev refuses): one public Facebook text post with a reference code, to check while signed out that app posts are public. Delete it within 10 minutes with <code>--delete</code>; the daily jobs delete a leftover one. Only with the owner's OK.</li>
+<li><code>scripts\windows\wake-trial.ps1 [-Sleep]</code>: what Windows allows without an administrator prompt for waking the laptop at post times; results in the data folder's <code>run\wake-trial.json</code> and in <code>docs\superpowers\plans\2026-11-19-sm-008-decisions.md</code>. <code>-Sleep</code> puts the laptop to sleep: only with the owner present.</li>
+<li>The folder's lock file is <code>scripts\hostinger\relay.htaccess</code>; <b>Test the folder</b> writes it into the folder.</li>
+<li>Dev never publishes: every Meta call that would publish is refused before it is sent unless the copy is App with <code>SMM_PUBLISH_MODE=live</code>.</li>
+</ul>
 
 <h2>For Claude: setting up a copy</h2>
 <p>Only needed once per copy, or on a new laptop after the code is downloaded from GitHub (the script installs the packages itself). It never replaces an existing app key.</p>
