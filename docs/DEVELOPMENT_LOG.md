@@ -25,9 +25,14 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 - **Setup with you in Dev, 19 Nov:** key #1 valid, never expires, all permissions (one extra, instagram_manage_messages, to leave out of App's key); Page and Instagram connected; Hostinger folder test passed all 6 steps; **Test send against the real accounts passed all 12 steps** (photo and 5-second video to Instagram up to a prepared post, both to Facebook unpublished, all removed; nothing published).
 - 131 tests pass, including: every web request names a certificate list; too little Page access is named as such, not as a key permission; Dev refuses every publishing call before any request; secrets never appear on screen or in the database unencrypted; pasted keys with spaces or line breaks are cleaned; a key for another app, an invalid key, missing permissions, no Page, a Page without Instagram are each explained; a new key updates the accounts in place; the folder test leaves only the lock file, fails without the "noindex" header or when the folder can be listed, and treats a cached copy as a note; Test send never calls publish (also in live mode) and cleans up after an Instagram error or a failed Facebook read; file names with spaces, "!", "&" and Hindi letters work; no test can reach Meta or the website for real.
 
-**Commits:** branch `feat/sm-008-meta-connect`.
+**Commits:** branch `feat/sm-008-meta-connect`, merged as pull request #3 (main `b892c9c`, 19 Nov).
 
-**Where:** Dev — built and set up with you (Meta key, Hostinger folder, Test send passed 19 Nov). App — after you merge the pull request: switch App to live mode, make key #2 for App, run the Test send there, then the one agreed Facebook test post.
+**Where:** Dev — built and set up with you (Meta key #1, Hostinger folder, Test send passed 19 Nov). App — **live 20 Nov 2026**:
+- App updated after the merge (packages including the certificate list; self-check all OK; a real call from App reaches Meta).
+- You made the Meta app Live (privacy policy and category; Meta asked for no app review) and saved the App Secret, key #2 and the Hostinger folder in App. Key #2 is valid, never expires and differs from Dev's key; it also carries `instagram_manage_messages`, harmless while Instagram's Messages access is off (optional: make it again without).
+- Test the folder passed 6 of 6 and the Test send 12 of 12 in App with the Meta app Live; Meta showed nothing new on the Page or Instagram afterwards.
+- The one agreed Facebook test post (ref ff5be4) was seen by a signed-out browser and deleted 45 seconds later; Facebook now shows it as unavailable.
+- Still to do before part 3 (publisher): the wake-up test with the laptop asleep (`wake-trial.ps1 -Sleep`), with you present.
 
 ---
 
