@@ -32,7 +32,7 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 - You made the Meta app Live (privacy policy and category; Meta asked for no app review) and saved the App Secret, key #2 and the Hostinger folder in App. Key #2 is valid, never expires and differs from Dev's key; it also carries `instagram_manage_messages`, harmless while Instagram's Messages access is off (optional: make it again without).
 - Test the folder passed 6 of 6 and the Test send 12 of 12 in App with the Meta app Live; Meta showed nothing new on the Page or Instagram afterwards.
 - The one agreed Facebook test post (ref ff5be4) was seen by a signed-out browser and deleted 45 seconds later; Facebook now shows it as unavailable.
-- Still to do before part 3 (publisher): the wake-up test with the laptop asleep (`wake-trial.ps1 -Sleep`), with you present.
+- **Wake-up test with the laptop asleep, 21 Nov 2026 (with you, plugged in):** with "Allow wake timers" on "important only", the laptop slept straight through the app's wake time. With your OK it was set to **Enable when plugged in** (battery stays off; no administrator prompt needed). On the next run the laptop **woke by itself on time** (slept 19:39:58, woke 19:42:18, the task ran 19:42:48 against 19:42:46 planned), and Windows names the app's task as the wake source. Part 3 will give each queued post its own wake-up. Details are in `…-sm-008-decisions.md`.
 
 ---
 
