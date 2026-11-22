@@ -75,6 +75,13 @@ class LibraryScreensTest extends TestCase
             ->assertCanNotSeeTableRecords([$photo]);
     }
 
+    public function test_library_shows_which_networks_a_file_fits(): void
+    {
+        Livewire::test(ListMediaItems::class)
+            ->assertSee('✓ Instagram photo')
+            ->assertSee('✓ Reel');
+    }
+
     public function test_edit_labels_saves_and_logs_activity(): void
     {
         $ai = $this->item('CD AI/ChatGPT Image.png');

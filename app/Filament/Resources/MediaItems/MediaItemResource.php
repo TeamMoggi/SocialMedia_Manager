@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MediaItems;
 
 use App\Domain\Library\Thumbnails;
+use App\Domain\Posts\MediaRules;
 use App\Enums\MediaKind;
 use App\Enums\ProductRange;
 use App\Filament\Resources\MediaItems\Pages\ListMediaItems;
@@ -86,6 +87,14 @@ class MediaItemResource extends Resource
                     ->label('Pixels / length')
                     ->state(fn (MediaItem $record): ?string => self::shape($record))
                     ->placeholder('—'),
+                TextColumn::make('fits')
+                    ->label('Fits')
+                    ->state(fn (MediaItem $record): array => collect(MediaRules::badges($record))
+                        ->map(fn (bool $ok, string $check): string => ($ok ? '✓ ' : '✗ ').$check)
+                        ->values()
+                        ->all())
+                    ->badge()
+                    ->color(fn (string $state): string => str_starts_with($state, '✓') ? 'success' : 'danger'),
                 TextColumn::make('description')->label('Description')->limit(50)->searchable()->placeholder('—')->toggleable(),
                 TextColumn::make('missing_since')
                     ->label('')
