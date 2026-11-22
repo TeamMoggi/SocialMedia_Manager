@@ -4,7 +4,10 @@ namespace Tests\Unit;
 
 use App\Domain\Posts\MediaRules;
 use App\Domain\Posts\Problem;
+use App\Enums\MediaKind;
+use App\Enums\Network;
 use App\Enums\PostType;
+use App\Models\MediaItem;
 use Tests\TestCase;
 
 /** Meta's limits (Graph API v27.0 docs, read 22 Nov 2026) as block/warn checks, tested at their edges. */
@@ -173,9 +176,9 @@ class MediaRulesTest extends TestCase
 
     public function test_library_badges_count_png_as_jpeg_and_flag_long_reels(): void
     {
-        $png = new \App\Models\MediaItem(['relative_path' => 'CD AI/a.png', 'kind' => \App\Enums\MediaKind::AiImage,
+        $png = new MediaItem(['relative_path' => 'CD AI/a.png', 'kind' => MediaKind::AiImage,
             'mime' => 'image/png', 'bytes' => self::MB, 'width' => 1080, 'height' => 1080]);
-        $long = new \App\Models\MediaItem(['relative_path' => '5/long.mp4', 'kind' => \App\Enums\MediaKind::FinishedVideo,
+        $long = new MediaItem(['relative_path' => '5/long.mp4', 'kind' => MediaKind::FinishedVideo,
             'mime' => 'video/mp4', 'bytes' => 50 * self::MB, 'width' => 1080, 'height' => 1920, 'duration' => 1020.0,
             'codec' => 'avc1', 'fps' => 30.0, 'faststart' => true]);
 
@@ -185,7 +188,7 @@ class MediaRulesTest extends TestCase
 
     public function test_post_types_by_network(): void
     {
-        $this->assertSame(['facebook_text', 'facebook_link', 'facebook_photos', 'facebook_video'], array_keys(PostType::forNetwork(\App\Enums\Network::FacebookPage)));
-        $this->assertSame(\App\Enums\Network::Instagram, PostType::InstagramReel->network());
+        $this->assertSame(['facebook_text', 'facebook_link', 'facebook_photos', 'facebook_video'], array_keys(PostType::forNetwork(Network::FacebookPage)));
+        $this->assertSame(Network::Instagram, PostType::InstagramReel->network());
     }
 }

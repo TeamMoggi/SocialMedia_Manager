@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Domain\System\SystemHealth;
+use App\Models\Brand;
+use App\Models\MediaItem;
 use App\Models\Setting;
 use App\Support\PublishGuard;
 use Carbon\CarbonImmutable;
@@ -32,6 +34,7 @@ class DoctorCommand extends Command
         $this->checkPublishMode();
         $this->checkTimedJobs();
         $this->checkBackupPassword();
+        $this->checkLibrary();
 
         foreach ($this->results as [$level, $message]) {
             $this->line(str_pad($level, 6).$message);
@@ -43,6 +46,22 @@ class DoctorCommand extends Command
     private function add(string $level, string $message): void
     {
         $this->results[] = [$level, $message];
+    }
+
+    /** The Library's folders (Markting Social Media): read only; a missing one means no new files are found. */
+    private function checkLibrary(): void
+    {
+        try {
+            foreach (Brand::all() as $brand) {
+                foreach ($brand->librarySources() as $source) {
+                    is_dir($source)
+                        ? $this->add('OK', "Library folder found: {$source} (".MediaItem::where('brand_id', $brand->id)->whereNull('missing_since')->count().' files known)')
+                        : $this->add('WARN', "Library folder not found: {$source} (no new photos or videos are found until it is back)");
+                }
+            }
+        } catch (Throwable) {
+            // The database is not ready; the database check above already says so.
+        }
     }
 
     private function checkPhp(): void

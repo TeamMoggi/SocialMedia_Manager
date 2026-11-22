@@ -42,13 +42,13 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 21 November 2026<br>Up to SM-008</div>
+  <div class="meta">Updated 22 November 2026<br>Up to SM-009</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> since 20 November 2026 the app is connected to the Facebook Page and Instagram and can test the whole route to them without publishing (<b>Test send</b>). Writing, approving and automatic posting come next, ready by 6 December 2026. Until the first real post (Fri 4 Dec) and the pilot pass, keep posting with Meta Business Suite and LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> the app is connected to the Facebook Page and Instagram (since 20 November 2026). With SM-009 you can find every photo and video in the <b>Library</b>, write posts with a Facebook and an Instagram version, check them, <b>approve</b> them and move them on the <b>Calendar</b>. Approved posts are <b>not sent yet</b>: automatic posting (SM-010) comes next, for the first real posts on Fri 4 December 2026. Until then, anything that cannot wait goes through Meta Business Suite or LinkedIn's own scheduler.</div>
 
 <h2>What you will see</h2>
 <ul>
@@ -81,6 +81,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <ul>
 <li><b>Add another business:</b> open the brand menu at the top left and choose <b>Add a brand</b>. Type its name (for example Moggies Export Services) and save. Names must be different.</li>
 <li><b>Change a brand's name or time zone:</b> brand menu &rarr; <b>Brand settings</b>. The time zone is used for post times and reports; India (Asia/Kolkata) is the default.</li>
+<li><b>Library folders and brand rules</b> are in Brand settings too. Left empty, the Library reads <code>D:\Pravin\Moggi\Markting Social Media</code> and posts are checked against the standard five brand rules. A folder inside the app's own data folder is refused.</li>
 </ul>
 
 <h2>Connected accounts</h2>
@@ -113,8 +114,41 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <li><b>Test the folder</b> checks everything in about 10 seconds: the lock file, upload, download from the website, that the folder can't be listed, delete, and that the file is gone. Each step shows &check; or &cross; with a plain note.</li>
 </ul>
 
+<h2>Library</h2>
+<p><b>Library</b> (left menu) lists every photo, video, voice-over, music file and script in <b>Markting Social Media</b>. <b>The app only reads that folder: it never changes, moves, renames or deletes anything in it.</b> Keep working in the folder as before.</p>
+<ul>
+<li><b>New files show up by themselves</b> when you open the app, and every morning. To look straight away, press <b>Look for new files</b>. The first look at the whole folder can take a minute.</li>
+<li>Each file has <b>labels</b>: kind (photo, AI image, finished video, clip, voice-over, music, script), product range, <b>AI-made</b>, <b>shows people</b> and a description. The first labels are guessed from the folder and file names; correct them with <b>Edit labels</b>. Every change is recorded.</li>
+<li><b>Shows people</b> matters for AI-made files: a post with an AI-made file that shows people gets Instagram's AI label and the line "Visuals made with AI" on Facebook. A post can't be approved while an attached AI-made file has <i>Not answered</i>. The filter <i>AI-made, 'shows people' not answered</i> lists them.</li>
+<li><b>Fits</b> shows with &check; or &cross; whether a file meets Instagram's and Facebook's rules (photo, Story, Reel, Facebook video). PNG and WebP photos count as fitting: they are saved as JPEG when attached.</li>
+<li><b>Preview</b> shows the photo or plays the video. A <b>Missing</b> file has gone from the folder; if the same file turns up under another name or folder, it gets its labels back.</li>
+<li><b>Folders</b> (left menu): give a numbered folder a real name, for example "5" &rarr; "Customer video, June 2026".</li>
+</ul>
+
+<h2>Write a post</h2>
+<p><b>Posts</b> &rarr; <b>New post</b>.</p>
+<ol>
+<li><b>Main caption</b>: used everywhere unless a network has its own text. The counter shows characters, hashtags and mentions (Instagram takes up to 2,200 characters and 30 hashtags; the brand rule is up to 5 hashtags).</li>
+<li><b>Time</b>, in India time.</li>
+<li><b>Photos and videos, in order</b>: search the Library by any word in the name or description. Drag to change the order. Each file is <b>copied into the post</b>, so later changes to the original don't change the post.</li>
+<li>Switch on <b>Facebook</b> and/or <b>Instagram</b> and choose the kind of post: Facebook text, link, photo(s) or video; Instagram photo, carousel (2 to 20), Reel or Story. Give a network its own text if you want.</li>
+<li><b>Create</b>, then look at <b>Preview and checks</b> under the form: each network's caption as it will be sent, the photos, and the checks. <span style="color:#dc2626"><b>Must fix</b></span> stops approval; <span style="color:#d97706"><b>Note</b></span> is a warning only. Save to refresh the preview.</li>
+</ol>
+
+<h2>Approve</h2>
+<ul>
+<li>On a post, press <b>Approve</b> (it is greyed out while there is anything to <i>Must fix</i>). Tick each brand rule you have checked, then <b>Approve</b>. Who approved and when is recorded in the post's <b>History</b>.</li>
+<li><b>Changing the text, a network's version, or the photos and videos</b> (even only their order) of an approved post sends it back to <b>Waiting for approval</b>.</li>
+<li><b>Changing only the time</b> (for example on the Calendar) keeps the approval.</li>
+<li><b>Withdraw approval</b> takes an approval back. <b>Send for approval</b> marks a draft as ready for your check.</li>
+<li>Nothing is published yet in SM-009: sending at the post time comes with SM-010.</li>
+</ul>
+
+<h2>Calendar</h2>
+<p><b>Calendar</b> (left menu) shows the posts by week or month, coloured by state: grey draft, amber waiting for approval, green approved. Drag a post to another time; a post in the past can't be moved, and an approved post stays approved. Click a post to open it.</p>
+
 <h2>Test send</h2>
-<p><b>Test send</b> (left menu) takes one photo (.jpg) and one video (.mp4 or .mov) from your <b>Markting Social Media</b> folder through every step to Instagram and Facebook and <b>stops just before publishing: nothing is published</b>.</p>
+<p><b>Test send</b> (left menu) takes one photo (.jpg) and one video (.mp4 or .mov) from the <b>Library</b> through every step to Instagram and Facebook and <b>stops just before publishing: nothing is published</b>.</p>
 <ul>
 <li>Instagram: the file goes to the Hostinger folder, Instagram downloads and prepares it, then the file is removed.</li>
 <li>Facebook: the file is uploaded unpublished, checked, then deleted.</li>
@@ -128,7 +162,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <tbody>
 <tr><td><code>App</code></td><td>Your running copy of the app (the approved version). This guide and the plan are in <code>App\docs</code>.</td><td>Yes (code only)</td></tr>
 <tr><td><code>Dev</code></td><td>Claude's working copy for new changes. It never posts for real.</td><td>Yes (code only)</td></tr>
-<tr><td><code>Data</code></td><td>Your settings file, database, photos and videos. The app's private key is in the settings file.</td><td><b>Never</b></td></tr>
+<tr><td><code>Data</code></td><td>Your settings file, database, and the copies of the photos and videos used in posts (<code>Data\media\posts</code>). Library thumbnails are in <code>Data\thumbs</code> (not backed up; they are made again when needed). The app's private key is in the settings file.</td><td><b>Never</b></td></tr>
 <tr><td><code>Backups</code></td><td>Daily encrypted copies of <code>Data</code>. You copy this folder to your USB drive about once a week.</td><td><b>Never</b></td></tr>
 <tr><td><code>Tracker</code></td><td>Local copy of the <a href="https://claude.ai/artifact/Vq8Q6jpWRxQ645PNxv7PDp">online tracker</a>.</td><td>No</td></tr>
 <tr><td><code>Metricool_Export_2026-11-14</code></td><td>Your Metricool history, saved before the trial ended.</td><td>No</td></tr>
@@ -139,7 +173,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <ol>
 <li><b>First time:</b> open <b>Backups</b> (left menu) &rarr; <b>Set backup password</b>. Use at least 12 characters and type it twice. <b>Write it down and keep it away from the laptop</b>: without it nobody can open the backups, not even Claude.</li>
 <li><b>Every day</b> (when the laptop is on) the app saves a locked copy of everything into the <code>Backups</code> folder by itself. The newest 14 are kept. You can also press <b>Back up now</b>.</li>
-<li><b>About once a week:</b> plug in your USB drive, copy the whole <code>D:\Pravin\Moggi\SocialMedia_Manager\Backups</code> folder onto it, then press <b>I copied Backups to my USB drive today</b>. The app reminds you after 7 days.</li>
+<li><b>About once a week:</b> plug in your USB drive, copy the whole <code>D:\Pravin\Moggi\SocialMedia_Manager\Backups</code> folder onto it, then press <b>I copied Backups to my USB drive today</b>. The app reminds you after 7 days. <b>Copy <code>D:\Pravin\Moggi\Markting Social Media</code> to the USB drive too</b>: the app's backup holds only the files used in posts, not the whole folder.</li>
 <li><b>To restore:</b> ask Claude. (By hand, a backup opens with the free 7-Zip and your password.)</li>
 </ol>
 <p>The dashboard's <b>Backups</b> card turns into a list of warnings when something needs you: no password yet, a failed backup, no backup for over a day, or the USB copy is due.</p>
@@ -162,6 +196,13 @@ php artisan smm:doctor</pre>
 <li><code>scripts\windows\wake-trial.ps1 [-Sleep]</code>: what Windows allows without an administrator prompt for waking the laptop at post times; results in the data folder's <code>run\wake-trial.json</code> and in <code>docs\superpowers\plans\2026-11-19-sm-008-decisions.md</code>. <code>-Sleep</code> puts the laptop to sleep: only with the owner present. Sleep test passed on 21 Nov 2026 after wake timers were set to Enable (plugged in); check the wake source with <code>powercfg /lastwake</code>.</li>
 <li>The folder's lock file is <code>scripts\hostinger\relay.htaccess</code>; <b>Test the folder</b> writes it into the folder.</li>
 <li>Dev never publishes: every Meta call that would publish is refused before it is sent unless the copy is App with <code>SMM_PUBLISH_MODE=live</code>.</li>
+</ul>
+
+<h2>For Claude: Library commands</h2>
+<ul>
+<li><code>php artisan smm:media:scan</code>: look for new, changed, moved and missing files (read only). Runs when the app opens (start.ps1, in the background; log in the data folder's <code>logs\media-scan.log</code>), in the daily jobs, and from <b>Look for new files</b>.</li>
+<li><code>php artisan smm:media:find raisin grading --attachable --limit=10</code>: every word must match the folder name, path, labels or description; prints full paths, facts (size, pixels, length, codec), which networks each file fits, and how many posts use it. Options: <code>--kind=</code>, <code>--range=</code>, <code>--include-missing</code>.</li>
+<li><code>php artisan smm:media:label labels.json</code>: Claude's labelling pass (owner's OK, 18 Nov 2026). The file sets folder names (<code>groups</code>: folder, name) and file labels (<code>items</code>: path, kind, product_range, ai_made, shows_people, description). It changes nothing else, logs every change as "by Claude", reports unknown paths, and changes nothing at all if any value is invalid. Run it in App for the real labels.</li>
 </ul>
 
 <h2>For Claude: setting up a copy</h2>

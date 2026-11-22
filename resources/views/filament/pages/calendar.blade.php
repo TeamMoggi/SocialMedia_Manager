@@ -32,6 +32,7 @@
                 headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridWeek,dayGridMonth' },
                 buttonText: { today: 'Today', week: 'Week', month: 'Month' },
                 eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+                slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
                 editable: true,
                 eventDurationEditable: false,
                 eventAllow: (drop) => drop.start >= new Date(@js($now)),
