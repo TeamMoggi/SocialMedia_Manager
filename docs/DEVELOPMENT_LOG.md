@@ -37,7 +37,18 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 - **No posting yet:** approved posts are not sent until SM-010.
 
 **Checks**
-- 238 tests pass. They include:
+- **Independent review of the whole branch** (a fresh reviewer, 22 Nov): it found 1 critical issue (two ways an approved post's content could change while it stayed approved) and 5 important ones. All are fixed, plus 2 small ones that mattered in practice. Each fix has a test that failed first.
+  - Approval now covers what each network will actually send, including the AI line. A label change in the Library sends approved posts that use the file back for approval. Part 3 gets a single "still approved" check to run before sending.
+  - Saving a post is all or nothing: a photo that can't be copied shows a plain message and changes nothing.
+  - A post whose original file was deleted can still be saved.
+  - Very large PNG or WebP pictures (over 40 megapixels) are refused before they could run the laptop out of memory.
+  - The preview shows the post's own copy, not the Library's current file.
+  - A time changed in the form follows the calendar's rules (future only, logged).
+  - The week view shows the whole day, opening at 07:00.
+  - `smm:media:find` finds names with "_".
+  - A folder that holds the app's own data or code can't be added as a Library folder.
+  - 13 smaller points are noted for later; none affects posting.
+- 252 tests pass. They include:
   - Scanning never changes the source folder; a renamed file keeps its labels; an unreachable drive marks nothing missing; a locked file is skipped and found next time; a second scan at the same time is skipped.
   - Every rule is tested at its exact edges.
   - Copies survive a renamed original; PNG becomes JPEG on white.
