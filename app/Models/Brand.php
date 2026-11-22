@@ -68,6 +68,11 @@ class Brand extends Model
         return $this->hasMany(MediaItem::class);
     }
 
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
     public function connectedAccounts(): HasMany
     {
         return $this->hasMany(ConnectedAccount::class);

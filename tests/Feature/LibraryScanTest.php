@@ -47,7 +47,6 @@ class LibraryScanTest extends TestCase
     {
         $img = imagecreatetruecolor($w, $h);
         imagejpeg($img, $path, 80);
-        imagedestroy($img);
     }
 
     private function scan()

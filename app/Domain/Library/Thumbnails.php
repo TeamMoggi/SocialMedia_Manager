@@ -55,8 +55,6 @@ final class Thumbnails
             imagecopyresampled($thumb, $image, 0, 0, 0, 0, $thumbWidth, $thumbHeight, $width, $height);
             File::ensureDirectoryExists(self::dir());
             $saved = imagejpeg($thumb, $path, 80);
-            imagedestroy($image);
-            imagedestroy($thumb);
 
             return $saved ? $path : null;
         } catch (Throwable) {

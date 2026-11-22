@@ -7,6 +7,7 @@ use App\Enums\ProductRange;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A file found in a source folder (Markting Social Media), with its facts and labels. The app only reads
@@ -46,6 +47,11 @@ class MediaItem extends Model
     public function group(): BelongsTo
     {
         return $this->belongsTo(MediaGroup::class, 'media_group_id');
+    }
+
+    public function postMedia(): HasMany
+    {
+        return $this->hasMany(PostMedia::class);
     }
 
     public function fullPath(): string

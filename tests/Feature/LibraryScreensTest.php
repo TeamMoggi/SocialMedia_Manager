@@ -44,7 +44,6 @@ class LibraryScreensTest extends TestCase
         $img = imagecreatetruecolor(1200, 900);
         imagejpeg($img, $this->dir.'/5/raisins close up.jpg', 80);
         imagepng($img, $this->dir.'/CD AI/ChatGPT Image.png');
-        imagedestroy($img);
         Mp4Fixture::make($this->dir.'/5/final.mp4', 1080, 1920, 10.0);
         $this->brand->update(['library_sources' => [$this->dir]]);
         app(LibraryScanner::class)->scan($this->brand->fresh());
@@ -108,7 +107,6 @@ class LibraryScreensTest extends TestCase
     {
         $img = imagecreatetruecolor(100, 100);
         imagejpeg($img, $this->dir.'/5/new one.jpg', 80);
-        imagedestroy($img);
 
         Livewire::test(ListMediaItems::class)
             ->callAction('scan')

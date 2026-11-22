@@ -29,7 +29,6 @@ class MediaFactsTest extends TestCase
         File::ensureDirectoryExists(dirname($path));
         $img = imagecreatetruecolor($w, $h);
         imagejpeg($img, $path, 80);
-        imagedestroy($img);
     }
 
     public function test_jpeg_facts(): void

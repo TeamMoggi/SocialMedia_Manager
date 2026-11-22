@@ -95,6 +95,7 @@ class MediaItemResource extends Resource
                         ->all())
                     ->badge()
                     ->color(fn (string $state): string => str_starts_with($state, '✓') ? 'success' : 'danger'),
+                TextColumn::make('post_media_count')->label('Used in posts')->counts('postMedia'),
                 TextColumn::make('description')->label('Description')->limit(50)->searchable()->placeholder('—')->toggleable(),
                 TextColumn::make('missing_since')
                     ->label('')
