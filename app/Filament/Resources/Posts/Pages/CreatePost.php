@@ -13,6 +13,9 @@ class CreatePost extends CreateRecord
 {
     protected static string $resource = PostResource::class;
 
+    /** Creating the post, its versions and its copied photos and videos is one database transaction. */
+    protected ?bool $hasDatabaseTransactions = true;
+
     /** The Facebook and Instagram versions from the form, saved after the post exists. */
     private array $targetData = [];
 

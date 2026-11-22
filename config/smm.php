@@ -54,6 +54,9 @@ return [
         'facebook' => [
             'photo' => ['max_bytes' => 10 * 1048576, 'mimes' => ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/tiff']],
         ],
+        // PNG and WebP are turned into JPEG when attached; above this many pixels that could run the 8 GB laptop
+        // out of memory (and the result would be too big for Instagram and Facebook anyway).
+        'max_convert_pixels' => 40_000_000,
     ],
 
     // Meta's Graph API (Facebook Page and Instagram). v27.0 was the newest version on 19 Nov 2026.

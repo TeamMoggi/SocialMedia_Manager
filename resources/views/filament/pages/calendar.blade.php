@@ -25,8 +25,10 @@
                 now: @js($now),
                 initialView: 'timeGridWeek',
                 firstDay: 1,
-                slotMinTime: '06:00:00',
-                height: 'auto',
+                // The whole day (posts before 06:00 must show too), opened at 07:00 and scrollable.
+                slotMinTime: '00:00:00',
+                scrollTime: '07:00:00',
+                contentHeight: 640,
                 nowIndicator: true,
                 allDaySlot: false,
                 headerToolbar: { left: 'prev,next today', center: 'title', right: 'timeGridWeek,dayGridMonth' },

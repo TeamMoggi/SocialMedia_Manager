@@ -36,7 +36,9 @@ class MediaFindCommand extends Command
 
         $query = MediaItem::query()->with('group')->withCount('postMedia')->where('brand_id', $brand->id);
         foreach ((array) $this->argument('words') as $word) {
-            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], (string) $word).'%';
+            // "_" and "%" are left as they are: SQLite needs an ESCAPE clause to escape them, and as wildcards they
+            // still match themselves ("Gemini_Generated" finds Gemini_Generated_Image_x1.png).
+            $like = '%'.$word.'%';
             $query->where(fn ($q) => $q->where('relative_path', 'like', $like)
                 ->orWhere('description', 'like', $like)
                 ->orWhere('kind', 'like', $like)

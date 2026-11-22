@@ -19,8 +19,8 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
-use RuntimeException;
 use Tests\TestCase;
 
 class PostModelTest extends TestCase
@@ -190,10 +190,13 @@ class PostModelTest extends TestCase
         $item = $this->item('Images/raisins.jpg');
         unlink($this->dir.'/Images/raisins.jpg');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("'raisins.jpg' is no longer in its folder");
-
-        $this->attach($this->makePost(), $item);
+        try {
+            $this->attach($this->makePost(), $item);
+            $this->fail('Attaching a missing file should be refused');
+        } catch (ValidationException $e) {
+            // A plain-words validation error, so the post's save is undone and the message is shown.
+            $this->assertStringContainsString("'raisins.jpg' is no longer in its folder", collect($e->errors())->flatten()->first());
+        }
     }
 
     public function test_library_counts_posts_using_a_file(): void

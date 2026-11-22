@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Posts\Schemas;
 
 use App\Domain\Posts\CaptionStats;
+use App\Domain\Posts\PostMediaCopier;
 use App\Enums\AccountStatus;
 use App\Enums\Network;
 use App\Enums\PostType;
@@ -10,6 +11,8 @@ use App\Models\Brand;
 use App\Models\ConnectedAccount;
 use App\Models\MediaItem;
 use App\Models\Post;
+use App\Models\PostMedia;
+use Carbon\CarbonImmutable;
 use Closure;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DateTimePicker;
@@ -45,7 +48,20 @@ final class PostForm
                 ->label('Time')
                 ->timezone(fn (): string => self::zone())
                 ->seconds(false)
-                ->helperText(fn (): string => 'In '.self::zone().' time.'),
+                ->helperText(fn (): string => 'In '.self::zone().' time.')
+                // A new time must be in the future (a time saved earlier may stay as it is).
+                ->rule(fn (mixed $record): Closure => function (string $attribute, mixed $value, Closure $fail) use ($record): void {
+                    if (blank($value)) {
+                        return;
+                    }
+                    $new = CarbonImmutable::parse((string) $value, self::zone());
+                    if ($record instanceof Post && $record->scheduled_at !== null && $record->scheduled_at->equalTo($new)) {
+                        return;
+                    }
+                    if ($new->lessThanOrEqualTo(CarbonImmutable::now())) {
+                        $fail('Pick a time in the future.');
+                    }
+                }),
             Repeater::make('media')
                 ->label('Photos and videos, in order')
                 ->relationship('media')
@@ -60,12 +76,22 @@ final class PostForm
                         ->required()
                         ->getSearchResultsUsing(fn (string $search): array => self::searchLibrary($search))
                         ->getOptionLabelUsing(fn ($value): ?string => ($item = MediaItem::find($value)) ? self::label($item) : null)
-                        ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        ->rule(fn (mixed $record): Closure => function (string $attribute, mixed $value, Closure $fail) use ($record): void {
+                            // A file already in the post stays as it is: its copy is in the post's own folder, even if
+                            // the original has since been moved or deleted.
+                            if ($record instanceof PostMedia && (int) $record->media_item_id === (int) $value) {
+                                return;
+                            }
                             $item = MediaItem::query()->where('brand_id', self::brand()->id)->find($value);
                             if ($item === null || $item->isMissing() || ! is_file($item->fullPath())) {
                                 $fail('This file is no longer in its folder; press "Look for new files" in the Library, then pick it again.');
                             } elseif (! $item->kind->isAttachable()) {
                                 $fail('Only photos and videos can go in a post.');
+                            } elseif ($item->kind->isImage() && $item->facts_error !== null) {
+                                $fail('This picture could not be read; pick another one.');
+                            } elseif (in_array(strtolower(pathinfo($item->relative_path, PATHINFO_EXTENSION)), ['png', 'webp'], true)
+                                && ! PostMediaCopier::convertible($item->width, $item->height)) {
+                                $fail("This picture is too large to post ({$item->width}×{$item->height} pixels); save a smaller copy, for example 2000 pixels wide, and pick that.");
                             }
                         }),
                 ]),

@@ -9,6 +9,7 @@ use App\Filament\Resources\Posts\PostResource;
 use App\Filament\Resources\Posts\Schemas\PostForm;
 use App\Models\Activity;
 use App\Models\Post;
+use Carbon\CarbonImmutable;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -22,7 +23,13 @@ class EditPost extends EditRecord
 {
     protected static string $resource = PostResource::class;
 
+    /** The whole save (post, versions, photos and videos) is one database transaction: it succeeds or changes nothing. */
+    protected ?bool $hasDatabaseTransactions = true;
+
     private array $targetData = [];
+
+    /** A changed time, applied through Approval::reschedule (the same rules and log as the calendar). */
+    private ?array $timeChange = null;
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
@@ -33,6 +40,16 @@ class EditPost extends EditRecord
     {
         [$data, $this->targetData] = PostForm::splitTargets($data);
 
+        $this->timeChange = null;
+        if (array_key_exists('scheduled_at', $data)) {
+            $new = blank($data['scheduled_at']) ? null : CarbonImmutable::parse((string) $data['scheduled_at'], (string) config('app.timezone'))->utc();
+            $old = $this->post()->scheduled_at;
+            if (! ($new === null && $old === null) && ! ($new !== null && $old !== null && $new->equalTo($old))) {
+                $this->timeChange = [$new];
+            }
+            unset($data['scheduled_at']);
+        }
+
         return $data;
     }
 
@@ -40,6 +57,16 @@ class EditPost extends EditRecord
     {
         $post = $this->post();
         PostForm::saveTargets($post, $this->targetData);
+        if ($this->timeChange !== null) {
+            [$new] = $this->timeChange;
+            if ($new === null) {
+                $post->update(['scheduled_at' => null]);
+                Activity::record($post->brand, $post, 'time removed', [], $this->who());
+                app(Approval::class)->withdraw($post->fresh(), $this->who(), 'the time was removed');
+            } else {
+                app(Approval::class)->reschedule($post->fresh(), $new, $this->who());
+            }
+        }
         if (app(Approval::class)->reopenIfChanged($post->fresh(), $this->who())) {
             Notification::make()->title('The post changed, so it needs your approval again')->warning()->send();
         }

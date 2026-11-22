@@ -21,7 +21,7 @@ use Carbon\CarbonImmutable;
 final class Approval
 {
     /** @return list<Problem> */
-    public function problems(Post $post): array
+    public function problems(Post $post, bool $checkTime = true): array
     {
         $post->load(['targets', 'media.mediaItem']);
         $problems = [];
@@ -32,7 +32,7 @@ final class Approval
 
         if ($post->scheduled_at === null) {
             $problems[] = Problem::block('Pick a time for the post.');
-        } elseif ($post->scheduled_at->lessThanOrEqualTo(CarbonImmutable::now())) {
+        } elseif ($checkTime && $post->scheduled_at->lessThanOrEqualTo(CarbonImmutable::now())) {
             $problems[] = Problem::block('The time has passed; pick a time in the future.');
         }
 
@@ -136,13 +136,20 @@ final class Approval
         Activity::record($post->brand, $post, 'time changed', ['from' => $from, 'to' => $utc->setTimezone($zone)->format('j M Y, H:i')], $by);
     }
 
-    /** What approval covers: the caption, each network's version and the media in order (not the time). */
+    /**
+     * What approval covers: the caption, each network's version as it will be sent (its final caption, with the AI
+     * line) and the media in order, plus whether the AI label applies. Not the time.
+     */
     public function fingerprint(Post $post): string
     {
         $post->load(['targets', 'media']);
         $targets = $post->targets
             ->sortBy(fn (PostTarget $t): string => $t->network->value)
-            ->map(fn (PostTarget $t): array => [$t->network->value, $t->type->value, (string) $t->caption, (string) $t->link])
+            ->map(function (PostTarget $t) use ($post): array {
+                $t->setRelation('post', $post);
+
+                return [$t->network->value, $t->type->value, (string) $t->caption, (string) $t->link, CaptionBuilder::for($t)];
+            })
             ->values()
             ->all();
         $media = $post->media
@@ -151,7 +158,42 @@ final class Approval
             ->values()
             ->all();
 
-        return hash('sha256', json_encode([(string) $post->caption, $targets, $media]));
+        return hash('sha256', json_encode([(string) $post->caption, $targets, $media, AiLabel::applies($post)]));
+    }
+
+    /**
+     * The gate the publisher (part 3) checks right before handing a post over or publishing it: approved, nothing
+     * changed since, and nothing that blocks it now (its time passing is not a reason).
+     */
+    public function stillApproved(Post $post): bool
+    {
+        return $post->state === PostState::Approved
+            && $post->approved_fingerprint !== null
+            && hash_equals($post->approved_fingerprint, $this->fingerprint($post))
+            && ! MediaRules::hasBlock($this->problems($post, checkTime: false));
+    }
+
+    /**
+     * After a Library file's labels change: every approved post using it whose content changed (for example the AI
+     * line) or that is now blocked (for example "shows people" not answered) goes back for approval.
+     *
+     * @return int how many posts went back
+     */
+    public function recheckFor(MediaItem $item, string $by): int
+    {
+        $count = 0;
+        $posts = Post::query()
+            ->where('state', PostState::Approved)
+            ->whereHas('media', fn ($q) => $q->where('media_item_id', $item->id))
+            ->get();
+        foreach ($posts as $post) {
+            if (! $this->stillApproved($post)) {
+                $this->withdraw($post, $by, "a Library file it uses changed: '{$item->fileName()}'");
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     private function connected(Post $post, Network $network): bool

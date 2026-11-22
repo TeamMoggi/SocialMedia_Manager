@@ -2,6 +2,7 @@
 
 namespace App\Domain\Library;
 
+use App\Domain\Posts\Approval;
 use App\Enums\MediaKind;
 use App\Enums\ProductRange;
 use App\Models\Activity;
@@ -87,6 +88,8 @@ final class LabelImport
                 }
                 $item->save();
                 Activity::record($brand, $item, 'labels changed', array_map(fn ($v) => $v instanceof BackedEnum ? $v->value : $v, $dirty), $by);
+                // An approved post using this file goes back for approval if what it will send changed.
+                app(Approval::class)->recheckFor($item, $by);
                 $items++;
             }
 

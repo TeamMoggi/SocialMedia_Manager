@@ -1,12 +1,10 @@
 @php
-    use App\Domain\Library\Thumbnails;
     use App\Domain\Posts\AiLabel;
     use App\Domain\Posts\Approval;
     use App\Domain\Posts\CaptionBuilder;
     use App\Domain\Posts\CaptionStats;
     use App\Enums\Network;
     use App\Enums\PostType;
-    use App\Filament\Resources\MediaItems\MediaItemResource;
 
     $post = $getRecord()->fresh(['targets', 'media.mediaItem', 'brand']);
     $problems = app(Approval::class)->problems($post);
@@ -35,8 +33,9 @@
                 @if ($post->media->isNotEmpty() && ! in_array($target->type, [PostType::FacebookText, PostType::FacebookLink], true))
                     <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0">
                         @foreach ($post->media as $media)
-                            @if ($media->mediaItem && Thumbnails::possible($media->mediaItem))
-                                <img src="{{ MediaItemResource::fileUrl($media->mediaItem, 'thumb') }}" alt="{{ $media->name() }}" style="height:64px;border-radius:.4rem">
+                            @if (str_starts_with((string) $media->mime, 'image/') && filled($media->path))
+                                {{-- The post's own copy: what will be sent, even if the original has changed since. --}}
+                                <img src="{{ route('filament.app.library.post-media', ['tenant' => $post->brand->slug, 'media' => $media->id]) }}" alt="{{ $media->name() }}" style="height:64px;border-radius:.4rem">
                             @else
                                 <span style="font-size:.8rem;border:1px solid rgba(127,127,127,.3);border-radius:.4rem;padding:.25rem .5rem">{{ $media->name() }}</span>
                             @endif

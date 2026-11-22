@@ -49,6 +49,7 @@ class AppPanelProvider extends PanelProvider
             ->authenticatedTenantRoutes(function (): void {
                 Route::get('library/thumb/{item}', [LibraryFileController::class, 'thumb'])->name('library.thumb');
                 Route::get('library/file/{item}', [LibraryFileController::class, 'file'])->name('library.file');
+                Route::get('library/post-media/{media}', [LibraryFileController::class, 'postMedia'])->name('library.post-media');
             })
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

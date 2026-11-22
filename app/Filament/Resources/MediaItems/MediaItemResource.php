@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MediaItems;
 
 use App\Domain\Library\Thumbnails;
+use App\Domain\Posts\Approval;
 use App\Domain\Posts\MediaRules;
 use App\Enums\MediaKind;
 use App\Enums\ProductRange;
@@ -176,6 +177,8 @@ class MediaItemResource extends Resource
         /** @var Brand $brand */
         $brand = $item->brand;
         Activity::record($brand, $item, 'labels changed', array_map(fn ($v) => $v instanceof BackedEnum ? $v->value : $v, $changes), $by);
+        // An approved post using this file goes back for approval if what it will send changed.
+        app(Approval::class)->recheckFor($item, $by);
     }
 
     private static function shape(MediaItem $item): ?string

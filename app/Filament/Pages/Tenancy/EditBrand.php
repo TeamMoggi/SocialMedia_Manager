@@ -64,9 +64,13 @@ class EditBrand extends EditTenantProfile
             return;
         }
         $data = realpath(app('smm.data_dir')) ?: app('smm.data_dir');
+        $code = realpath(base_path()) ?: base_path();
         $normal = static fn (string $p): string => rtrim(strtolower(str_replace('\\', '/', $p)), '/').'/';
         if (str_starts_with($normal($real), $normal($data))) {
             $fail("This folder is inside the app's own data folder; pick a folder with your photos and videos.");
+        } elseif (str_starts_with($normal($data), $normal($real)) || str_starts_with($normal($code), $normal($real))) {
+            // A parent folder would make the Library read the app's own copies, thumbnails and code.
+            $fail("This folder holds the app's own data or code; pick the folder with your photos and videos.");
         }
     }
 }

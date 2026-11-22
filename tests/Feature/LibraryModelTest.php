@@ -97,13 +97,19 @@ class LibraryModelTest extends TestCase
         $this->actingAs(User::where('email', User::LOCAL_OWNER_EMAIL)->firstOrFail());
         Filament::setCurrentPanel('app');
         Filament::setTenant($this->brand);
-        $folder = sys_get_temp_dir();
+        // Its own folder: the temp folder itself holds the tests' data folder, so it is refused as a parent.
+        $folder = sys_get_temp_dir().DIRECTORY_SEPARATOR.'smm-photos-'.bin2hex(random_bytes(4));
+        mkdir($folder);
 
-        Livewire::test(EditBrand::class)
-            ->fillForm(['library_sources' => [['path' => $folder]]])
-            ->call('save')
-            ->assertHasNoFormErrors();
+        try {
+            Livewire::test(EditBrand::class)
+                ->fillForm(['library_sources' => [['path' => $folder]]])
+                ->call('save')
+                ->assertHasNoFormErrors();
 
-        $this->assertSame([$folder], $this->brand->fresh()->library_sources);
+            $this->assertSame([$folder], $this->brand->fresh()->library_sources);
+        } finally {
+            rmdir($folder);
+        }
     }
 }
