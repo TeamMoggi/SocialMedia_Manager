@@ -26,6 +26,18 @@ return [
     // The owner's photos and videos (read only, never changed): Test send picks from here, the library later.
     'library_source' => env('SMM_LIBRARY_SOURCE', 'D:\\Pravin\\Moggi\\Markting Social Media'),
 
+    // Photo thumbnails for the Library screen; outside media/, so the nightly backup leaves them out.
+    'thumbs_dir' => env('SMM_THUMBS_DIR'),
+
+    // The brand rules every post is checked against before approval (a brand can set its own list).
+    'approval_checklist' => [
+        "No real people's faces (hands, voice-overs and text on screen are fine)",
+        "AI-made people are labelled (the app adds Instagram's AI label and 'Visuals made with AI' on Facebook)",
+        'Only approved figures and wording: since 2021, 3 shipments every 2 months, ready to ship to any country (no list of countries); export figures checked against APEDA',
+        "No buyer names, labels or documents without the buyer's OK, and never the EIA test report",
+        'Export services: no promise to find buyers',
+    ],
+
     // Meta's Graph API (Facebook Page and Instagram). v27.0 was the newest version on 19 Nov 2026.
     'meta' => [
         'graph_version' => 'v27.0',
