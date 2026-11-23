@@ -64,9 +64,13 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
   - A post dragged on the calendar moved from Tue 24 to Wed 25 Nov 11:00 and kept its time of day.
   - The test post was then deleted.
 
-**Commits:** branch `feat/sm-009-library-composer` (from main `0f3808a`), one commit per task.
+**Commits:** branch `feat/sm-009-library-composer` (from main `0f3808a`), one commit per task, merged as pull request #6 (main `2b91dd4`).
 
-**Where:** Dev — built and checked, 22 Nov 2026 (the Dev database has the new tables and the Library is scanned). App — after you merge: update App, then the first Library scan runs when the app opens.
+**Where:** Dev — built and checked, 22 Nov 2026. App — **live 23 Nov 2026**:
+- App updated after the merge: pull, the new package (getID3), four database updates, caches cleared; self-check all OK.
+- First real Library scan in App: 237 files new, none changed, moved or missing. The library folder was compared before and after (241 files, 914 MB) and is unchanged.
+- The Library, Folders, Posts, create-post, Calendar and Meta pages all open in App. No post has been created or approved in App yet.
+- Still to do: part 3 (SM-010, automatic posting, must call `Approval::stillApproved()` before sending).
 
 ---
 
