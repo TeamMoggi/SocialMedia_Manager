@@ -29,6 +29,8 @@ class DailyCommand extends Command
             }
         });
         $this->job('Account check', fn () => $this->call('smm:check-accounts'));
+        // New, changed and missing files in Markting Social Media (read only, SM-009).
+        $this->job('Library scan', fn () => $this->call('smm:media:scan'));
         // A backup problem (for example no password yet) is shown on the Backups page; the other jobs go on.
         $this->job('Backup', fn () => $this->call('smm:backup', ['--if-older-than' => 20]));
         $this->job('Daily jobs record', fn () => $this->call('smm:heartbeat'));

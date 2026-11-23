@@ -4,6 +4,72 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-009 — Library, writing posts, approval, calendar (22 Nov 2026)
+
+**Tracker:** #20 (media library), #21 (composer), #22 (approval), #23 (calendar). Part 2 of the build. Design: `docs/superpowers/specs/2026-11-18-phase1-posting-design.md`. Plan: `docs/superpowers/plans/2026-11-22-sm-009-library-composer.md`, approved by you on 22 Nov 2026 together with its four choices (built Native).
+
+**What changed**
+- **Library** (left menu): every photo, video, voice-over, music file and script in Markting Social Media.
+  - **The folder is only read**: the app never changes, moves, renames or deletes anything there.
+  - New files are found when the app opens (in the background), every morning, and with **Look for new files**.
+  - A file that has gone is marked Missing, not deleted. If the same file turns up under another name, it keeps its labels.
+  - Labels: kind, product range, AI-made, shows people, description. The first guess comes from folder and file names.
+  - Each file shows which networks it **fits** (Instagram photo, Story, Reel, Facebook photo or video), with a thumbnail and a preview.
+  - **Folders** can be given proper names.
+- **Write a post** (Posts): one main caption, a time in India time, and the photos and videos in order, picked from the Library and **copied into the post**. PNG and WebP are saved as JPEG.
+  - A Facebook version (text, link, photo(s), video) and an Instagram version (photo, carousel of 2 to 20, Reel, Story), each with its own text if wanted.
+  - **Preview and checks** under the form: red *Must fix* and amber *Note*.
+- **Approve**: tick the five brand rules (editable in Brand settings), then Approve. Approve is greyed out while anything must be fixed.
+  - Changing the text, a version, or the photos and videos (even their order) of an approved post sends it back for approval. Changing only the time does not.
+  - Every step is in the post's History.
+- **AI label**: when an attached file is AI-made and shows people, the Facebook caption ends with "Visuals made with AI" and Instagram's own AI label is set for sending.
+  - A post can't be approved while an AI-made file's "shows people" is not answered.
+- **Calendar**: week and month views coloured by state; drag a post to another time. Posts in the past can't be moved.
+- **Test send** now picks its photo and video from the Library.
+- **For Claude:**
+  - `smm:media:find` searches the Library and prints full paths and facts.
+  - `smm:media:label` applies a labels file: labels and folder names only, logged as "by Claude", all or nothing.
+  - `smm:doctor` reports whether the Library folder is found.
+- **New add-ons:**
+  - **james-heinrich/getid3** reads video facts in pure PHP (there is no ffmpeg on the laptop); added with your OK.
+  - **FullCalendar 6.1.15** (MIT) is kept as one file in `public/vendor`, so the calendar works offline and no plugin can break it.
+- **Meta's limits** were taken from Meta's v27.0 documentation on 22 Nov 2026: Instagram photos are JPEG only, up to 8 MB, shaped 4:5 to 1.91:1; Reels run 3 s to 15 min, up to 300 MB; Story videos up to 60 s; carousels hold 2 to 20 items; captions take up to 2,200 characters and 30 hashtags; Facebook photos up to 10 MB.
+- **No posting yet:** approved posts are not sent until SM-010.
+
+**Checks**
+- **Independent review of the whole branch** (a fresh reviewer, 22 Nov): it found 1 critical issue (two ways an approved post's content could change while it stayed approved) and 5 important ones. All are fixed, plus 2 small ones that mattered in practice. Each fix has a test that failed first.
+  - Approval now covers what each network will actually send, including the AI line. A label change in the Library sends approved posts that use the file back for approval. Part 3 gets a single "still approved" check to run before sending.
+  - Saving a post is all or nothing: a photo that can't be copied shows a plain message and changes nothing.
+  - A post whose original file was deleted can still be saved.
+  - Very large PNG or WebP pictures (over 40 megapixels) are refused before they could run the laptop out of memory.
+  - The preview shows the post's own copy, not the Library's current file.
+  - A time changed in the form follows the calendar's rules (future only, logged).
+  - The week view shows the whole day, opening at 07:00.
+  - `smm:media:find` finds names with "_".
+  - A folder that holds the app's own data or code can't be added as a Library folder.
+  - 13 smaller points are noted for later; none affects posting.
+- 252 tests pass. They include:
+  - Scanning never changes the source folder; a renamed file keeps its labels; an unreachable drive marks nothing missing; a locked file is skipped and found next time; a second scan at the same time is skipped.
+  - Every rule is tested at its exact edges.
+  - Copies survive a renamed original; PNG becomes JPEG on white.
+  - Approval refuses blocking problems, unticked rules, unanswered AI files, accounts that are not connected, and past times.
+  - A content change reopens approval and a time change does not.
+  - Calendar times stay in India time around midnight.
+  - Another brand's posts can't be listed, opened or moved (checked with real requests).
+- **Your real folder, read-only proof (Dev, 22 Nov):** all 238 files were listed with size and date before and after a full scan, and the lists were identical. The first scan indexed 237 files in 7 s and the next took 1 s. 156 files can go in posts; every file's facts were read; 27 are marked AI-made.
+- **Finding:** 53 of your videos (Filmora exports among them) have their index at the end of the file. Meta's rules ask for it at the front, but a Test send on 22 Nov showed Instagram accepting such a video ("Custromer out side Final.mp4"). So it is an amber note, not a block.
+- **Same Test send:** the Facebook **video** upload was refused because the system user no longer has full control of the Page; Meta now lists no Page access for it. Facebook photos and Instagram still worked. This is on the tracker (#52) for you to fix in Business settings before the first Facebook video post.
+- **Screens in Dev (headless Edge, 1366 and 390 px):** Library, Folders, Posts, a post's page, New post, Calendar and Test send all open with no script errors and no sideways scrolling.
+  - The Approve dialog lists the brand rules.
+  - A post dragged on the calendar moved from Tue 24 to Wed 25 Nov 11:00 and kept its time of day.
+  - The test post was then deleted.
+
+**Commits:** branch `feat/sm-009-library-composer` (from main `0f3808a`), one commit per task.
+
+**Where:** Dev — built and checked, 22 Nov 2026 (the Dev database has the new tables and the Library is scanned). App — after you merge: update App, then the first Library scan runs when the app opens.
+
+---
+
 ## SM-008 — Connect Facebook and Instagram, Hostinger folder, Test send (19 Nov 2026)
 
 **Tracker:** #18 (connect Facebook and Instagram), #11 (Hostinger folder). Part 1 of the next build (design `docs/superpowers/specs/2026-11-18-phase1-posting-design.md`, approved 19 Nov 2026; plan `docs/superpowers/plans/2026-11-19-sm-008-meta-connect.md`; build notes `…-sm-008-decisions.md`).

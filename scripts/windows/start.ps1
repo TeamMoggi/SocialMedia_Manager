@@ -26,6 +26,15 @@ if (-not (Test-SmmApp)) {
     }
 }
 
+# Look for new photos and videos in the Library's folders, in the background (read only; SM-009).
+try {
+    $scanLog = Join-Path $SmmData 'logs\media-scan.log'
+    $scanErr = Join-Path $SmmData 'logs\media-scan-error.log'
+    Start-Process -FilePath (Get-SmmPhp $Php) -ArgumentList @('artisan', 'smm:media:scan') -WorkingDirectory $SmmRepo -WindowStyle Hidden -RedirectStandardOutput $scanLog -RedirectStandardError $scanErr | Out-Null
+} catch {
+    Write-Host "The Library scan did not start; use 'Look for new files' on the Library page."
+}
+
 Write-Host "SocialMedia Manager is running: $SmmUrl"
 if ($Open) { Start-Process $SmmUrl }
 exit 0

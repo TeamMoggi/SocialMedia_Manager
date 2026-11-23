@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Tenancy\EditBrand;
 use App\Filament\Pages\Tenancy\RegisterBrand;
+use App\Http\Controllers\LibraryFileController;
 use App\Http\Middleware\AutoLoginLocalOwner;
 use App\Models\Brand;
 use Filament\Http\Middleware\Authenticate;
@@ -19,6 +20,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AppPanelProvider extends PanelProvider
@@ -43,6 +45,12 @@ class AppPanelProvider extends PanelProvider
             ->tenant(Brand::class, slugAttribute: 'slug')
             ->tenantRegistration(RegisterBrand::class)
             ->tenantProfile(EditBrand::class)
+            // Library thumbnails and previews (signed-in, inside the brand; SM-009).
+            ->authenticatedTenantRoutes(function (): void {
+                Route::get('library/thumb/{item}', [LibraryFileController::class, 'thumb'])->name('library.thumb');
+                Route::get('library/file/{item}', [LibraryFileController::class, 'file'])->name('library.file');
+                Route::get('library/post-media/{media}', [LibraryFileController::class, 'postMedia'])->name('library.post-media');
+            })
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([Dashboard::class])

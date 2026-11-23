@@ -13,9 +13,14 @@ use Illuminate\Support\Str;
  */
 class Brand extends Model
 {
-    protected $fillable = ['name', 'slug', 'timezone'];
+    protected $fillable = ['name', 'slug', 'timezone', 'library_sources', 'approval_checklist'];
 
     protected $attributes = ['timezone' => 'Asia/Kolkata'];
+
+    protected function casts(): array
+    {
+        return ['library_sources' => 'array', 'approval_checklist' => 'array'];
+    }
 
     protected static function booted(): void
     {
@@ -35,6 +40,37 @@ class Brand extends Model
         }
 
         return $slug;
+    }
+
+    /** @return list<string> The folders the library reads (never changes); Markting Social Media unless set. */
+    public function librarySources(): array
+    {
+        $sources = array_values(array_filter((array) $this->library_sources, fn ($p) => is_string($p) && trim($p) !== ''));
+
+        return $sources ?: [(string) config('smm.library_source')];
+    }
+
+    /** @return list<string> The brand rules every post is checked against before approval. */
+    public function approvalChecklist(): array
+    {
+        $items = array_values(array_filter((array) $this->approval_checklist, fn ($i) => is_string($i) && trim($i) !== ''));
+
+        return $items ?: array_values((array) config('smm.approval_checklist'));
+    }
+
+    public function mediaGroups(): HasMany
+    {
+        return $this->hasMany(MediaGroup::class);
+    }
+
+    public function mediaItems(): HasMany
+    {
+        return $this->hasMany(MediaItem::class);
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
     }
 
     public function connectedAccounts(): HasMany

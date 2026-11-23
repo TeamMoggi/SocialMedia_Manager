@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Brand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,6 +17,22 @@ class DoctorCommandTest extends TestCase
             ->expectsOutputToContain('Data folder')
             ->expectsOutputToContain('Publish mode: dry-run')
             ->doesntExpectOutputToContain('FAIL')
+            ->assertExitCode(0);
+    }
+
+    public function test_doctor_reports_library_folder(): void
+    {
+        $brand = Brand::create(['name' => 'Moggies Test']);
+        $brand->update(['library_sources' => [sys_get_temp_dir()]]);
+
+        $this->artisan('smm:doctor')
+            ->expectsOutputToContain('OK    Library folder found: '.sys_get_temp_dir())
+            ->assertExitCode(0);
+
+        $brand->update(['library_sources' => ['Z:\\No such folder']]);
+
+        $this->artisan('smm:doctor')
+            ->expectsOutputToContain('WARN  Library folder not found: Z:\\No such folder')
             ->assertExitCode(0);
     }
 
