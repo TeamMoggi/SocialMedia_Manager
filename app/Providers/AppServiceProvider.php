@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Domain\Meta\MetaGraph;
+use App\Domain\Publishing\TargetCleanup;
 use App\Domain\Relay\RelayFolder;
 use Composer\CaBundle\CaBundle;
 use Illuminate\Support\Facades\Http;
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MetaGraph::class, fn () => MetaGraph::make());
         // The Hostinger folder: null until the owner has saved its details.
         $this->app->bind(RelayFolder::class, fn () => RelayFolder::fromSettings());
+        // What Facebook and the Hostinger folder hold for a post, kept in step when the owner changes the post (SM-010).
+        $this->app->bind(TargetCleanup::class, fn () => TargetCleanup::make());
     }
 
     /**

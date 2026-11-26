@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Publishing\TargetCleanup;
 use App\Enums\Network;
 use App\Enums\PostState;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,11 @@ class Post extends Model
     {
         // The copies of the post's photos and videos go with it; the files in the Library's folders stay.
         static::deleting(function (Post $post): void {
+            // Facebook's scheduled copy and the Hostinger files go too (published versions are left alone).
+            $cleanup = app(TargetCleanup::class);
+            foreach ($post->targets()->get() as $target) {
+                $cleanup->release($target->setRelation('post', $post));
+            }
             $post->media()->get()->each->delete();
             File::deleteDirectory($post->mediaDir());
         });

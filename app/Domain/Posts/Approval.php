@@ -2,6 +2,7 @@
 
 namespace App\Domain\Posts;
 
+use App\Domain\Publishing\TargetCleanup;
 use App\Enums\AccountStatus;
 use App\Enums\Network;
 use App\Enums\PostState;
@@ -102,7 +103,6 @@ final class Approval
         if ($post->state !== PostState::Approved) {
             return;
         }
-        // Part 3 (SM-010) also takes back a post already handed to Facebook here.
         $post->update([
             'state' => PostState::AwaitingApproval,
             'approved_at' => null,
@@ -110,6 +110,11 @@ final class Approval
             'checklist' => null,
             'approved_fingerprint' => null,
         ]);
+        // A post already handed to Facebook or prepared on Instagram is taken back (SM-010).
+        $cleanup = app(TargetCleanup::class);
+        foreach ($post->targets()->get() as $target) {
+            $cleanup->release($target->setRelation('post', $post));
+        }
         Activity::record($post->brand, $post, 'approval withdrawn', ['reason' => $reason], $by);
     }
 
@@ -133,6 +138,11 @@ final class Approval
         $zone = $post->brand->timezone ?: (string) config('smm.display_timezone');
         $from = $post->scheduled_at?->setTimezone($zone)->format('j M Y, H:i');
         $post->update(['scheduled_at' => $utc]);
+        // Facebook gets the new time (or the scheduled copy is taken back); Instagram is prepared again later.
+        $cleanup = app(TargetCleanup::class);
+        foreach ($post->targets()->get() as $target) {
+            $cleanup->moved($target->setRelation('post', $post), $utc);
+        }
         Activity::record($post->brand, $post, 'time changed', ['from' => $from, 'to' => $utc->setTimezone($zone)->format('j M Y, H:i')], $by);
     }
 
