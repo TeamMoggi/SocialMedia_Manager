@@ -59,6 +59,16 @@ return [
         'max_convert_pixels' => 40_000_000,
     ],
 
+    // Automatic posting (SM-010). Minutes unless a name says days; owner's rule of 26 Nov 2026: a post not sent on
+    // time is tried again on each of the next 3 days, then goes to the Missed list.
+    'publishing' => [
+        'on_time_minutes' => 15,
+        'retry_minutes' => [1, 4, 10],
+        'catch_up_days' => 3,
+        'lead_minutes' => ['light' => 15, 'heavy' => 30],
+        'facebook_min_minutes' => 10,
+        'facebook_max_days' => 75,
+    ],
     // Meta's Graph API (Facebook Page and Instagram). v27.0 was the newest version on 19 Nov 2026.
     'meta' => [
         'graph_version' => 'v27.0',

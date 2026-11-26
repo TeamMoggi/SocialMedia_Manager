@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Domain\Publishing\TargetCleanup;
 use App\Enums\Network;
 use App\Enums\PostState;
+use App\Enums\TargetState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,9 +34,21 @@ class Post extends Model
     protected static function booted(): void
     {
         // The copies of the post's photos and videos go with it; the files in the Library's folders stay.
-        static::deleting(function (Post $post): void {
+        static::deleting(function (Post $post): ?bool {
+            // Facebook's scheduled copy and the Hostinger files go too (published versions are left alone).
+            $cleanup = app(TargetCleanup::class);
+            foreach ($post->targets()->get() as $target) {
+                $cleanup->release($target->setRelation('post', $post));
+            }
+            // A copy Facebook still holds that could not be taken back: keep the post (and its record) instead of
+            // deleting the only trace of something that will still be published.
+            if ($post->targets()->where('state', TargetState::HandedToFacebook->value)->exists()) {
+                return false;
+            }
             $post->media()->get()->each->delete();
             File::deleteDirectory($post->mediaDir());
+
+            return null;
         });
     }
 

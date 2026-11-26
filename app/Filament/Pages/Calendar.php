@@ -6,6 +6,7 @@ use App\Domain\Posts\Approval;
 use App\Domain\Posts\ApprovalRefused;
 use App\Enums\Network;
 use App\Enums\PostState;
+use App\Enums\TargetState;
 use App\Filament\Resources\Posts\PostResource;
 use App\Models\Brand;
 use App\Models\Post;
@@ -60,7 +61,7 @@ class Calendar extends Page
                 'id' => $post->id,
                 'title' => $this->title($post),
                 'start' => $post->scheduled_at->setTimezone($zone)->format('Y-m-d\TH:i:s').'Z',
-                'color' => $post->state->color(),
+                'color' => $this->colour($post),
                 'url' => PostResource::getUrl('edit', ['record' => $post, 'tenant' => $this->brand()]),
                 'editable' => $post->scheduled_at->greaterThan($now),
             ])
@@ -100,6 +101,19 @@ class Calendar extends Page
         } catch (Throwable) {
             return null;
         }
+    }
+
+    /** Sending shows in the colour: red (failed or missed), amber (late), green (published), blue (handed over or queued), else the post's state. */
+    private function colour(Post $post): string
+    {
+        $states = $post->targets->map(fn (PostTarget $t): TargetState => $t->state);
+        return match (true) {
+            $states->contains(fn (TargetState $s): bool => in_array($s, [TargetState::Failed, TargetState::Missed], true)) => '#dc2626',
+            $states->contains(TargetState::Late) => '#d97706',
+            $states->contains(TargetState::Published) => '#16a34a',
+            $states->contains(fn (TargetState $s): bool => in_array($s, [TargetState::HandedToFacebook, TargetState::Queued], true)) => '#2563eb',
+            default => $post->state->color(),
+        };
     }
 
     private function title(Post $post): string

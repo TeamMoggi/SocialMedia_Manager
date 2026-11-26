@@ -12,6 +12,7 @@ enum TargetState: string implements HasLabel
     case Queued = 'queued';
     case Published = 'published';
     case Failed = 'failed';
+    case Late = 'late';
     case Missed = 'missed';
 
     public function label(): string
@@ -22,6 +23,7 @@ enum TargetState: string implements HasLabel
             self::Queued => 'Queued',
             self::Published => 'Published',
             self::Failed => 'Failed',
+            self::Late => 'Late: will retry',
             self::Missed => 'Missed',
         };
     }

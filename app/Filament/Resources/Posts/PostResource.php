@@ -6,6 +6,7 @@ use App\Domain\Posts\Approval;
 use App\Domain\Posts\MediaRules;
 use App\Enums\Network;
 use App\Enums\PostState;
+use App\Enums\TargetState;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
@@ -53,9 +54,7 @@ class PostResource extends Resource
                 TextColumn::make('caption')->label('Caption')->limit(60)->placeholder('No caption yet')->wrap(),
                 TextColumn::make('networks')
                     ->label('Networks')
-                    ->state(fn (Post $record): array => $record->targets
-                        ->map(fn (PostTarget $t): string => $t->network === Network::FacebookPage ? 'Facebook' : 'Instagram')
-                        ->all())
+                    ->state(fn (Post $record): array => self::sendingSummary($record))
                     ->badge(),
                 TextColumn::make('state')->label('State')->badge(),
                 TextColumn::make('red_checks')
@@ -70,6 +69,16 @@ class PostResource extends Resource
             ->defaultSort('scheduled_at')
             ->emptyStateHeading('No posts yet')
             ->emptyStateDescription('Press "New post" to write one. Nothing is sent before you approve it.');
+    }
+
+    /** @return list<string> each network and where its sending stands, for example "Facebook: Published" */
+    public static function sendingSummary(Post $post): array
+    {
+        return $post->targets
+            ->sortBy(fn (PostTarget $t): string => $t->network->value)
+            ->map(fn (PostTarget $t): string => ($t->network === Network::FacebookPage ? 'Facebook' : 'Instagram').($t->state === TargetState::Waiting ? '' : ': '.$t->state->label()))
+            ->values()
+            ->all();
     }
 
     public static function hasBlocks(Post $post): bool

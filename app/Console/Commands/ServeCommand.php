@@ -34,12 +34,24 @@ class ServeCommand extends Command
         IdleWatch::touch();
         $this->info("SocialMedia Manager runs at http://127.0.0.1:{$port} and stops after {$idle} minutes without use.");
 
+        $publisher = null;
+        $publisherStarted = 0;
         while ($server->isRunning()) {
             sleep(15);
             clearstatcache();
+            // While the app is open, due posts are sent from here once a minute (its own process, never a web request).
+            if (($publisher === null || ! $publisher->isRunning()) && time() - $publisherStarted >= 60) {
+                $publisher = new Process([$php, 'artisan', 'smm:publish-due', '--no-interaction'], base_path(), null, null, 3600);
+                $publisher->start();
+                $publisherStarted = time();
+            }
             $last = @filemtime(IdleWatch::activityFile()) ?: time();
             if (IdleWatch::shouldStop($last, time(), $idle)) {
                 $this->info('Not used for '.$idle.' minutes: stopping.');
+                // A publish pass still working (for example a video being prepared) is allowed to finish.
+                if ($publisher !== null && $publisher->isRunning()) {
+                    $publisher->wait();
+                }
                 $server->stop(5);
                 break;
             }

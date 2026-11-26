@@ -2,7 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Network;
+use App\Enums\PostState;
+use App\Enums\PostType;
 use App\Models\Brand;
+use App\Models\Post;
+use App\Models\PostTarget;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,5 +49,32 @@ class DoctorCommandTest extends TestCase
         $this->artisan('smm:doctor')
             ->expectsOutputToContain('FAIL  1 database update(s) waiting: run php artisan migrate')
             ->assertExitCode(1);
+    }
+
+    private function waitingPost(): void
+    {
+        $brand = Brand::create(['name' => 'Moggies Test']);
+        $post = Post::create(['brand_id' => $brand->id, 'caption' => 'x', 'state' => PostState::Approved, 'scheduled_at' => now()->addDay()]);
+        PostTarget::create(['post_id' => $post->id, 'network' => Network::Instagram, 'type' => PostType::InstagramPhoto]);
+    }
+
+    public function test_doctor_warns_when_a_post_is_waiting_and_wake_timers_are_off_while_plugged_in(): void
+    {
+        $this->waitingPost();
+        app()->bind('smm.powercfg', fn () => fn () => "Current AC Power Setting Index: 0x00000000\nCurrent DC Power Setting Index: 0x00000000\n");
+
+        $this->artisan('smm:doctor')
+            ->expectsOutputToContain('WARN  Wake timers are off while plugged in: the laptop will not wake for posts')
+            ->assertExitCode(0);
+    }
+
+    public function test_doctor_is_quiet_with_nothing_waiting_and_happy_when_wake_timers_are_on(): void
+    {
+        app()->bind('smm.powercfg', fn () => fn () => "Current AC Power Setting Index: 0x00000000\n");
+        $this->artisan('smm:doctor')->doesntExpectOutputToContain('Wake timers')->assertExitCode(0);
+
+        $this->waitingPost();
+        app()->bind('smm.powercfg', fn () => fn () => "Current AC Power Setting Index: 0x00000001\n");
+        $this->artisan('smm:doctor')->expectsOutputToContain('OK    Wake timers are on while plugged in')->assertExitCode(0);
     }
 }
