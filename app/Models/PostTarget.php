@@ -14,6 +14,7 @@ class PostTarget extends Model
     protected $fillable = [
         'post_id', 'network', 'connected_account_id', 'type', 'caption', 'link', 'state', 'external_id',
         'container_id', 'permalink', 'attempts', 'last_error', 'published_at',
+        'next_attempt_at', 'late_days', 'work',
     ];
 
     protected $attributes = ['state' => 'waiting', 'attempts' => 0];
@@ -25,6 +26,8 @@ class PostTarget extends Model
             'type' => PostType::class,
             'state' => TargetState::class,
             'published_at' => 'immutable_datetime',
+            'next_attempt_at' => 'immutable_datetime',
+            'work' => 'array',
         ];
     }
 
