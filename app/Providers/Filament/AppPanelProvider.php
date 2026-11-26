@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Tenancy\EditBrand;
 use App\Filament\Pages\Tenancy\RegisterBrand;
 use App\Http\Controllers\LibraryFileController;
+use App\Http\Controllers\LinkedInAuthController;
 use App\Http\Middleware\AutoLoginLocalOwner;
 use App\Models\Brand;
 use Filament\Http\Middleware\Authenticate;
@@ -50,6 +51,12 @@ class AppPanelProvider extends PanelProvider
                 Route::get('library/thumb/{item}', [LibraryFileController::class, 'thumb'])->name('library.thumb');
                 Route::get('library/file/{item}', [LibraryFileController::class, 'file'])->name('library.file');
                 Route::get('library/post-media/{media}', [LibraryFileController::class, 'postMedia'])->name('library.post-media');
+                // LinkedIn sign-in (SM-011): starts inside the brand, on localhost.
+                Route::get('linkedin/start', [LinkedInAuthController::class, 'start'])->name('linkedin.start');
+            })
+            // LinkedIn sends the owner back here: the address is fixed in the LinkedIn developer portal, so no brand in it.
+            ->authenticatedRoutes(function (): void {
+                Route::get('linkedin/callback', [LinkedInAuthController::class, 'callback'])->name('linkedin.callback');
             })
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
