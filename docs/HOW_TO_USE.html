@@ -42,13 +42,13 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 23 November 2026<br>Up to SM-009</div>
+  <div class="meta">Updated 26 November 2026<br>Up to SM-010</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> since 23 November 2026 the Library, Posts, approval and Calendar are live in the App you open every day. The app is connected to the Facebook Page and Instagram (since 20 November 2026). With SM-009 you can find every photo and video in the <b>Library</b>, write posts with a Facebook and an Instagram version, check them, <b>approve</b> them and move them on the <b>Calendar</b>. Approved posts are <b>not sent yet</b>: automatic posting (SM-010) comes next, for the first real posts on Fri 4 December 2026. Until then, anything that cannot wait goes through Meta Business Suite or LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> since 23 November 2026 the Library, Posts, approval and Calendar are live in the App you open every day. The app is connected to the Facebook Page and Instagram (since 20 November 2026). With SM-009 you can find every photo and video in the <b>Library</b>, write posts with a Facebook and an Instagram version, check them, <b>approve</b> them and move them on the <b>Calendar</b>. Approved posts are <b>not sent yet</b>: automatic posting (SM-010) is built and waits for its merge and update, for the first real posts on Fri 4 December 2026. Until then, anything that cannot wait goes through Meta Business Suite or LinkedIn's own scheduler. The section <b>Automatic posting</b> below says how it will work.</div>
 
 <h2>What you will see</h2>
 <ul>
@@ -141,11 +141,25 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <li><b>Changing the text, a network's version, or the photos and videos</b> (even only their order) of an approved post sends it back to <b>Waiting for approval</b>.</li>
 <li><b>Changing only the time</b> (for example on the Calendar) keeps the approval.</li>
 <li><b>Withdraw approval</b> takes an approval back. <b>Send for approval</b> marks a draft as ready for your check.</li>
-<li>Nothing is published yet in SM-009: sending at the post time comes with SM-010.</li>
+<li>Once SM-010 is in the App, an approved post is sent by itself at its time (see <b>Automatic posting</b>). Changing, withdrawing or deleting a post also takes back whatever Facebook was already holding for it.</li>
 </ul>
 
 <h2>Calendar</h2>
-<p><b>Calendar</b> (left menu) shows the posts by week or month, coloured by state: grey draft, amber waiting for approval, green approved. Drag a post to another time; a post in the past can't be moved, and an approved post stays approved. Click a post to open it.</p>
+<p><b>Calendar</b> (left menu) shows the posts by week or month, coloured by state: grey draft, amber waiting for approval, green approved or published; once sending starts, blue is handed over to Facebook or queued, amber late, red failed or missed. Drag a post to another time; a post in the past can't be moved, and an approved post stays approved. Click a post to open it.</p>
+
+<h2>Automatic posting</h2>
+<p>An approved post goes out by itself at its time, on the Facebook Page and on Instagram. You do not press anything.</p>
+<ul>
+<li><b>Facebook:</b> the post is handed to Facebook in advance with its time, so Facebook publishes it itself, even if the laptop is off then. Only a post set less than 10 minutes ahead is sent by the app at its time.</li>
+<li><b>Instagram:</b> Instagram cannot schedule, so the app does it: 15 minutes before (30 for a video or carousel) it copies the files to the Hostinger folder and has Instagram prepare them, publishes at the post time, saves the link and clears the folder.</li>
+<li><b>What must be true at post time:</b> the laptop is on or asleep, the charger is in, and you are signed in to Windows. The app sets up a wake-up for each post by itself (no password prompt). The first time, check that <b>smm:doctor</b> does not warn about wake timers.</li>
+<li><b>If something goes wrong:</b> a temporary problem is tried again after 1, 4 and 10 minutes. A problem that will not go away (for example a permission) stops at once and tells you in plain words.</li>
+<li><b>If the laptop was off at post time:</b> the post is marked <b>Late</b> and the app tries again <b>once on each of the next three days</b> (the first time it runs that day: at 09:00, at a wake-up, or when you open the app). After those three days it is <b>Missed</b> and is never sent without you.</li>
+<li><b>Missed posts</b> (left menu, with a red number): everything late, failed or missed, with what went wrong. Press <b>Post now</b> to send it at the next check, or <b>New time</b> to choose another time.</li>
+<li><b>Pop-ups:</b> Windows shows a pop-up when a post is published, late, missed or failed (when you are signed in); the same notices wait under the bell in the app.</li>
+<li><b>Changing a post:</b> a post you edit goes back to <b>Waiting for approval</b> and is taken back from Facebook and Instagram's preparation. Moving it on the Calendar moves Facebook's copy too. A post that is already published is never removed from Facebook or Instagram by the app.</li>
+<li>Each post's page has a <b>Sending</b> block: the state per network, the link once published, and the last error.</li>
+</ul>
 
 <h2>Test send</h2>
 <p><b>Test send</b> (left menu) takes one photo (.jpg) and one video (.mp4 or .mov) from the <b>Library</b> through every step to Instagram and Facebook and <b>stops just before publishing: nothing is published</b>.</p>
@@ -196,6 +210,14 @@ php artisan smm:doctor</pre>
 <li><code>scripts\windows\wake-trial.ps1 [-Sleep]</code>: what Windows allows without an administrator prompt for waking the laptop at post times; results in the data folder's <code>run\wake-trial.json</code> and in <code>docs\superpowers\plans\2026-11-19-sm-008-decisions.md</code>. <code>-Sleep</code> puts the laptop to sleep: only with the owner present. Sleep test passed on 21 Nov 2026 after wake timers were set to Enable (plugged in); check the wake source with <code>powercfg /lastwake</code>.</li>
 <li>The folder's lock file is <code>scripts\hostinger\relay.htaccess</code>; <b>Test the folder</b> writes it into the folder.</li>
 <li>Dev never publishes: every Meta call that would publish is refused before it is sent unless the copy is App with <code>SMM_PUBLISH_MODE=live</code>.</li>
+</ul>
+
+<h2>For Claude: publishing commands</h2>
+<ul>
+<li><code>php artisan smm:publish-due [--now="2026-12-04 06:00:00"]</code>: one pass over everything due (hand-overs, Instagram prepare and publish, retries, next-day catch-up, Missed). Runs from the wake-up tasks, every minute while the app is open (<code>smm:serve</code>), and in <code>smm:daily</code>. A lock file (<code>run\publish.lock</code>) lets only one run work. In Dev it only prints "dry run: would ..." and sends nothing.</li>
+<li><code>scripts\windows\wake-at.ps1 -Times "&lt;ISO times&gt;"</code>: makes one-time tasks <code>\SocialMediaManager\Publish-&lt;yyyyMMddHHmm UTC&gt;</code> (wake to run, Interactive, no administrator prompt) and removes the ones no longer needed; <code>publish.ps1</code> is what they run; <code>notify.ps1</code> shows the Windows pop-up. The app calls <code>wake-at.ps1</code> itself after every approval, time change and publish pass. In Dev it only works with <code>-AllowDev</code>.</li>
+<li>Timing values are in <code>config/smm.php</code> under <code>publishing</code> (15-minute on-time window, retries 1/4/10 minutes, 3 catch-up days, Facebook window 10 minutes to 75 days, Instagram lead 15/30 minutes).</li>
+<li>Before sending anything the publisher checks <code>Approval::stillApproved()</code>; a post that changed is withdrawn, not sent.</li>
 </ul>
 
 <h2>For Claude: Library commands</h2>

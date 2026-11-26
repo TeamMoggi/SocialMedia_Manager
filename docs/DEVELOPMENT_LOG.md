@@ -4,6 +4,26 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-010 — Automatic posting (26 Nov 2026)
+
+**Tracker:** #24 (publisher), and the start of #26 (pilot). Part 3 of the build. Design: `docs/superpowers/specs/2026-11-18-phase1-posting-design.md` §7. Plan: `docs/superpowers/plans/2026-11-26-sm-010-publisher.md` (approved by you on 26 Nov 2026; built Native). Decisions and deferred items: `docs/superpowers/plans/2026-11-26-sm-010-decisions.md`.
+
+**What changed**
+- **One command, `smm:publish-due`**, walks every network version of every approved post and asks a pure planner what to do now. It runs from wake-up tasks, every minute while the app is open, and in `smm:daily`. A lock lets only one run work.
+- **Facebook:** handed over with a scheduled time when it is 10 minutes to 75 days ahead; published by the app at its time when closer; confirmed afterwards (not public an hour late = a notice). Changing, withdrawing or deleting the post updates or deletes Facebook's copy.
+- **Instagram:** files go to the Hostinger folder and containers are made 15 minutes (30 for video and carousels) before; publish at the time; link saved; folder cleared. A guard saved before the publish call stops a second post after a crash.
+- **Retries and the next-day rule (your change of 26 Nov):** temporary errors are tried again after 1, 4 and 10 minutes; permanent ones stop at once. A post not sent within 15 minutes is **Late** and is tried once on each of the next three days; after that it is **Missed** and waits for you.
+- **Missed posts** page (Post now, New time), sending state in the post list, a Sending block on each post, calendar colours.
+- **Wake-ups and pop-ups:** one-time Windows tasks per moment (`wake-at.ps1`, Interactive and wake-to-run, no administrator prompt), `notify.ps1` for the pop-up; `smm:doctor` warns when wake timers are off while a post is waiting.
+- **Safety:** nothing is sent unless `Approval::stillApproved()` is true; Dev never calls Meta to publish or upload (the senders refuse unless the graph is live).
+- **For Claude:** see "For Claude: publishing commands" in the how-to guide.
+
+**How it was checked:** 331 tests green (planner, both senders, the publisher incl. the retry, late, missed and crash cases, approval hooks, wake times, pages, an end-to-end pass); `wake-at.ps1` made and removed a real task in Dev without a prompt; `smm:publish-due` ran in Dev against DevData (dry run). Not checked yet: a real post (needs the merge, the App update and you at the laptop), the Windows pop-up on screen, wake from sleep for a real post.
+
+**Where it stands:** Dev: built on `feat/sm-010-publisher`. App: not yet.
+
+---
+
 ## SM-009 — Library, writing posts, approval, calendar (22 Nov 2026)
 
 **Tracker:** #20 (media library), #21 (composer), #22 (approval), #23 (calendar). Part 2 of the build. Design: `docs/superpowers/specs/2026-11-18-phase1-posting-design.md`. Plan: `docs/superpowers/plans/2026-11-22-sm-009-library-composer.md`, approved by you on 22 Nov 2026 together with its four choices (built Native).
