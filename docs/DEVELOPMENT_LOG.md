@@ -4,6 +4,29 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-011 — Connect the LinkedIn company page (26 Nov 2026)
+
+**Tracker:** #19 (connect the LinkedIn company page), after #10 (LinkedIn approved app 265142813 for the Community Management API, Development tier, on 25 Nov 2026). Design: `docs/superpowers/specs/2026-11-26-sm-011-linkedin-connect-design.md`. Plan: `docs/superpowers/plans/2026-11-26-sm-011-linkedin-connect.md`, both approved by you on 26 Nov 2026 (built Native). Built on its own branch from main, so the publisher work (SM-010) is untouched.
+
+**What changed**
+- **LinkedIn page** (left menu, after Meta): Client ID and Client Secret (**Save app details**), the connected page with its key's end date, **Connect LinkedIn** / **Reconnect LinkedIn** and **Check the key now**.
+- **Sign-in:** Connect moves the browser to `http://localhost:{port}` (8090 App, 8091 Dev; both addresses saved in LinkedIn's portal on 26 Nov), opens LinkedIn, and LinkedIn sends you back to `/linkedin/callback`. You end on the LinkedIn page at the usual `127.0.0.1` address with the result.
+  - A sign-in link works once, for 10 minutes. Cancel, a wrong account or a missing permission saves nothing, and a working connection stays as it was.
+  - The app connects only if the signed-in LinkedIn account is an **Administrator** of the brand's page (Moggies International = 145339181).
+- **Permissions asked:** `rw_organization_admin` (find and manage the page), `w_organization_social` (post as the page, next step), `r_organization_social` (read the page's posts back). No personal-profile permissions; comment permissions come with the comments inbox (#34).
+- **Key:** LinkedIn's keys last 60 days and our tier gets no renewal keys. The key is stored encrypted on the LinkedIn connected account with its end date; the usual warning comes 7 days before, then **Reconnect LinkedIn**.
+- **Daily check** (`smm:check-accounts`, 09:00): asks LinkedIn which pages the key administers. A refused key or a page no longer administered marks the account "Problem" with one bell message; no internet, LinkedIn's own trouble or its daily limit changes nothing.
+- **API version** `LinkedIn-Version: 202611` (newest on 26 Nov 2026; LinkedIn supports each version at least a year). Development tier allows 500 calls a day; connecting and the daily check use a few.
+- Only the page id, name, role and permissions are stored, no member data (LinkedIn's data rules).
+
+**Checks**
+- 49 new tests (client, credentials, connector, sign-in round trip, page, daily check); full suite 301/301.
+- Real sign-in in a separate test copy (`Dev-LinkedIn`, data `DevLinkedInData`, port 8091): see below.
+
+**Where:** branch `feat/sm-011-linkedin-connect`. Dev: built and tested. App: not yet.
+
+---
+
 ## SM-009 — Library, writing posts, approval, calendar (22 Nov 2026)
 
 **Tracker:** #20 (media library), #21 (composer), #22 (approval), #23 (calendar). Part 2 of the build. Design: `docs/superpowers/specs/2026-11-18-phase1-posting-design.md`. Plan: `docs/superpowers/plans/2026-11-22-sm-009-library-composer.md`, approved by you on 22 Nov 2026 together with its four choices (built Native).

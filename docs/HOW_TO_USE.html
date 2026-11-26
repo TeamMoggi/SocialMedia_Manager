@@ -42,13 +42,13 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 <header>
   <div class="plate"><img src="assets/moggies-international-logo.png" alt="Moggies International logo"></div>
   <div class="name">Moggies International<small>SocialMedia Manager &middot; How to use</small></div>
-  <div class="meta">Updated 23 November 2026<br>Up to SM-009</div>
+  <div class="meta">Updated 26 November 2026<br>Up to SM-011 (LinkedIn connect)</div>
 </header>
 
 <h1>How to use SocialMedia Manager</h1>
 <p class="lede">Our own app for planning, approving, publishing and measuring posts on Instagram, Facebook and the LinkedIn company page. It runs on this laptop. This guide grows with every step that changes what you can do.</p>
 
-<div class="note warn"><b>Where we are:</b> since 23 November 2026 the Library, Posts, approval and Calendar are live in the App you open every day. The app is connected to the Facebook Page and Instagram (since 20 November 2026). With SM-009 you can find every photo and video in the <b>Library</b>, write posts with a Facebook and an Instagram version, check them, <b>approve</b> them and move them on the <b>Calendar</b>. Approved posts are <b>not sent yet</b>: automatic posting (SM-010) comes next, for the first real posts on Fri 4 December 2026. Until then, anything that cannot wait goes through Meta Business Suite or LinkedIn's own scheduler.</div>
+<div class="note warn"><b>Where we are:</b> since 23 November 2026 the Library, Posts, approval and Calendar are live in the App you open every day. The app is connected to the Facebook Page and Instagram (since 20 November 2026). With SM-009 you can find every photo and video in the <b>Library</b>, write posts with a Facebook and an Instagram version, check them, <b>approve</b> them and move them on the <b>Calendar</b>. Approved posts are <b>not sent yet</b>: automatic posting (SM-010) comes next, for the first real posts on Fri 4 December 2026. Until then, anything that cannot wait goes through Meta Business Suite or LinkedIn's own scheduler. LinkedIn approved our access on 25 November 2026; with SM-011 the app can <b>connect the LinkedIn company page</b> (see LinkedIn below). Posting to LinkedIn from the app comes in a later step.</div>
 
 <h2>What you will see</h2>
 <ul>
@@ -85,7 +85,7 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 </ul>
 
 <h2>Connected accounts</h2>
-<p>The <b>Connected accounts</b> page (left menu) lists the brand's Facebook Page, Instagram account and LinkedIn company page with their state. Facebook and Instagram are connected from the <b>Meta</b> page (below); LinkedIn comes once LinkedIn approves our access.</p>
+<p>The <b>Connected accounts</b> page (left menu) lists the brand's Facebook Page, Instagram account and LinkedIn company page with their state. Facebook and Instagram are connected from the <b>Meta</b> page, the LinkedIn company page from the <b>LinkedIn</b> page (both below).</p>
 <div class="table-wrap"><table>
 <thead><tr><th>State</th><th>What it means</th><th>What to do</th></tr></thead>
 <tbody>
@@ -106,6 +106,17 @@ footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid va
 </ol>
 <div class="note warn"><b>Keep it secret:</b> the App Secret and the key can post as the business. Paste them only into the app, never into a chat, email or document. The app stores them locked and shows only "Saved on &lt;date&gt;". If one might have leaked, make a new key (and you can remove the old one in business settings).</div>
 <p>The page warns when the key is missing a permission the app needs (it then does not connect), lacks permissions needed later for statistics and comments, or has more access than needed. <b>Check the key now</b> asks Meta again.</p>
+
+<h2>LinkedIn: connect, and every 2 months</h2>
+<p>The app reaches the LinkedIn company page <b>Moggies International</b> (page 145339181) through the LinkedIn developer app <b>Moggies Social Manager</b> (app 265142813, approved for the Community Management API on 25 November 2026). LinkedIn's key lasts <b>2 months</b> and the app cannot renew it by itself, so you press one button every 2 months.</p>
+<ol>
+<li><b>App details (once):</b> on linkedin.com/developers open <b>My apps</b> &rarr; <b>Moggies Social Manager</b> &rarr; <b>Auth</b>. In the app open <b>LinkedIn</b> &rarr; <b>Save app details</b>: the Client ID is filled in; copy the <b>Client Secret</b> from the Auth tab (the copy icon next to the dots) and paste it.</li>
+<li><b>Connect:</b> press <b>Connect LinkedIn</b>. The browser moves to <code>localhost</code> (the address saved in LinkedIn's portal) and opens LinkedIn. Sign in with the account that is an <b>Administrator</b> of the company page (today: Moggies In) and press <b>Allow</b>.</li>
+<li>You come back to the LinkedIn page with <b>Connected: Moggies International, key valid until &lt;date&gt;</b>. The page also shows the date.</li>
+<li><b>Every 2 months:</b> 7 days before the date the bell says the access expires soon. Open <b>LinkedIn</b> and press <b>Reconnect LinkedIn</b>; it is the same two clicks.</li>
+</ol>
+<p>The app asks LinkedIn only for what it needs: find and manage the page, post as the page, and read the page's own posts back. It asks for nothing on your personal profile. If you press <b>Cancel</b> on LinkedIn, or sign in with an account that does not administer the page, nothing changes and a working connection stays as it was. A sign-in link works once, for 10 minutes. <b>Check the key now</b> asks LinkedIn again; the daily check does the same at 09:00.</p>
+<div class="note warn"><b>Keep it secret:</b> the Client Secret lets anyone act as the LinkedIn app. Paste it only into the app, never into a chat, email or document. If it might have leaked, press <b>Generate a new Client Secret</b> on the Auth tab and save the new one with <b>Change app details</b>. Never press LinkedIn's <b>Request upgrade</b> without Claude: that is the Standard tier application (tracker #41).</div>
 
 <h2>Hostinger folder</h2>
 <p>Instagram only takes photos and videos from a web address, and this laptop has none. Just before an Instagram post the app puts the file in a <b>hidden folder on moggiesinternational.com</b> and deletes it straight after. The folder can't be listed or found by search engines, and its FTP account can reach nothing else on the website. Don't put other files in it.</p>
