@@ -68,5 +68,19 @@ return [
         'app_id' => '2181731786035384',
     ],
 
+    // LinkedIn Community Management API (Development tier, approved 25 Nov 2026). Version 202611 was the newest
+    // on 26 Nov 2026; LinkedIn supports each monthly version for at least a year.
+    'linkedin' => [
+        // The LinkedIn developer app "Moggies Social Manager" (app 265142813); the Client ID is public.
+        'client_id' => '77qh6eszwh69s9',
+        'version' => '202611',
+        'auth_url' => 'https://www.linkedin.com/oauth/v2',
+        'rest_url' => 'https://api.linkedin.com/rest',
+        // Moggies International's company page (linkedin.com/company/moggies-international).
+        'default_org_id' => '145339181',
+        // A sign-in link (state) works once, for this many minutes.
+        'state_minutes' => 10,
+    ],
+
     'required_extensions' => ['curl', 'fileinfo', 'ftp', 'gd', 'intl', 'mbstring', 'openssl', 'pdo_sqlite', 'sqlite3', 'sodium', 'zip'],
 ];
