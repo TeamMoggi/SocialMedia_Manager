@@ -20,10 +20,20 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 - Only the page id, name, role and permissions are stored, no member data (LinkedIn's data rules).
 
 **Checks**
-- 49 new tests (client, credentials, connector, sign-in round trip, page, daily check); full suite 301/301.
-- Real sign-in in a separate test copy (`Dev-LinkedIn`, data `DevLinkedInData`, port 8091): see below.
+- 54 new tests (client, credentials, connector, sign-in round trip, page, daily check, server-log redaction); full suite 306/306.
+- **Independent review of the whole branch** (a fresh reviewer, 26 Nov): no critical issues, 2 important ones, plus one minor one treated as important. All 3 are fixed, each with a test that failed first:
+  - the daily check now marks "Problem" only when LinkedIn refuses the key (401) or the page access (403); anything else is "could not check now";
+  - **Check the key now** records its result like the daily check;
+  - the sign-in code is hidden in `logs/server.log`.
+  - 6 small points are left for later (see the decisions file).
+- **Real sign-in, 26 Nov 2026, 11:55 India time**, in a separate test copy (`Dev-LinkedIn`, data `DevLinkedInData`, port 8091). You signed in as Moggies In and pressed Allow.
+  - Connected: Moggies International (145339181), role ADMINISTRATOR, key valid until 25 Jan 2027.
+  - LinkedIn granted exactly `r_organization_social`, `rw_organization_admin`, `w_organization_social`.
+  - `smm:check-accounts` printed "LinkedIn key: works." (version 202611 and LinkedIn's real `organizationAcls` reply work).
+  - The server log shows `/linkedin/callback` with no code. Nothing was posted (dry run).
+- Setting up a fresh copy: if packages are installed before `.data-dir` exists, run `php artisan filament:upgrade` afterwards, or the screens load without their styles.
 
-**Where:** branch `feat/sm-011-linkedin-connect`. Dev: built and tested. App: not yet.
+**Where:** branch `feat/sm-011-linkedin-connect`. Dev: built, reviewed, real sign-in done. App: not yet (after the merge you connect once more in App on 8090; each copy keeps its own key).
 
 ---
 
