@@ -43,5 +43,6 @@ class Notifier
             default => $notification->danger(),
         };
         $notification->sendToDatabase($brand->users);
+        Popup::show((string) $notification->getTitle(), $text);
     }
 }

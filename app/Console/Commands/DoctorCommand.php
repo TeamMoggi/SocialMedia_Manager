@@ -4,7 +4,10 @@ namespace App\Console\Commands;
 
 use App\Domain\System\SystemHealth;
 use App\Models\Brand;
+use App\Enums\PostState;
+use App\Enums\TargetState;
 use App\Models\MediaItem;
+use App\Models\PostTarget;
 use App\Models\Setting;
 use App\Support\PublishGuard;
 use Carbon\CarbonImmutable;
@@ -33,6 +36,7 @@ class DoctorCommand extends Command
         $this->checkZipEncryption();
         $this->checkPublishMode();
         $this->checkTimedJobs();
+        $this->checkWakeTimers();
         $this->checkBackupPassword();
         $this->checkLibrary();
 
@@ -128,6 +132,37 @@ class DoctorCommand extends Command
             return;
         }
         $this->add('OK', 'Publish mode: '.PublishGuard::effectiveMode($configured, base_path()));
+    }
+
+    /**
+     * Posts wake the laptop at their time through "wake timers"; while plugged in they must be on (the 21 Nov 2026
+     * wake-up test). Only matters while an approved post is waiting.
+     */
+    private function checkWakeTimers(): void
+    {
+        $read = app()->bound('smm.powercfg')
+            ? app('smm.powercfg')
+            : (PHP_OS_FAMILY === 'Windows' && ! app()->runningUnitTests()
+                ? fn (): string => (string) shell_exec('powercfg /query SCHEME_CURRENT SUB_SLEEP RTCWAKE 2>NUL')
+                : null);
+        if ($read === null) {
+            return;
+        }
+        try {
+            $waiting = PostTarget::query()
+                ->whereIn('state', [TargetState::Waiting, TargetState::Queued])
+                ->whereHas('post', fn ($q) => $q->where('state', PostState::Approved)->where('scheduled_at', '>', now()))
+                ->exists();
+        } catch (Throwable) {
+            return; // the database check above already reported the problem
+        }
+        if (! $waiting) {
+            return;
+        }
+        $on = preg_match('/AC Power Setting Index:\s*0x([0-9a-fA-F]+)/', $read(), $m) === 1 && hexdec($m[1]) === 1;
+        $on
+            ? $this->add('OK', 'Wake timers are on while plugged in')
+            : $this->add('WARN', 'Wake timers are off while plugged in: the laptop will not wake for posts (powercfg /setacvalueindex SCHEME_CURRENT SUB_SLEEP RTCWAKE 1, then /setactive SCHEME_CURRENT)');
     }
 
     private function checkBackupPassword(): void

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Publishing\Publisher;
+use App\Domain\Publishing\WakeTasks;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
@@ -20,12 +21,15 @@ class PublishDueCommand extends Command
     public function handle(): int
     {
         $now = $this->option('now') ? CarbonImmutable::parse((string) $this->option('now'), 'UTC') : null;
-        $result = Publisher::make()->run($now);
+        $result = app(Publisher::class)->run($now);
 
         foreach ($result['lines'] as $line) {
             $this->line($line);
         }
         $this->info("Published {$result['done']}, failed {$result['failed']}, late {$result['late']}, missed {$result['missed']}.");
+
+        // Wake-up tasks follow what is waiting now (Windows, App copy only).
+        app(WakeTasks::class)->sync();
 
         return self::SUCCESS;
     }

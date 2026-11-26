@@ -3,6 +3,7 @@
 namespace App\Domain\Posts;
 
 use App\Domain\Publishing\TargetCleanup;
+use App\Domain\Publishing\WakeTasks;
 use App\Enums\AccountStatus;
 use App\Enums\Network;
 use App\Enums\PostState;
@@ -96,6 +97,7 @@ final class Approval
             'approved_fingerprint' => $this->fingerprint($post),
         ]);
         Activity::record($post->brand, $post, 'approved', ['checklist' => $required], $by);
+        app(WakeTasks::class)->sync();
     }
 
     public function withdraw(Post $post, string $by, string $reason): void
@@ -116,6 +118,7 @@ final class Approval
             $cleanup->release($target->setRelation('post', $post));
         }
         Activity::record($post->brand, $post, 'approval withdrawn', ['reason' => $reason], $by);
+        app(WakeTasks::class)->sync();
     }
 
     /** Sends an approved post back for approval if its content changed since it was approved. */
@@ -144,6 +147,7 @@ final class Approval
             $cleanup->moved($target->setRelation('post', $post), $utc);
         }
         Activity::record($post->brand, $post, 'time changed', ['from' => $from, 'to' => $utc->setTimezone($zone)->format('j M Y, H:i')], $by);
+        app(WakeTasks::class)->sync();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Domain\Meta\MetaGraph;
+use App\Domain\Publishing\Publisher;
 use App\Domain\Publishing\TargetCleanup;
 use App\Domain\Relay\RelayFolder;
 use Composer\CaBundle\CaBundle;
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RelayFolder::class, fn () => RelayFolder::fromSettings());
         // What Facebook and the Hostinger folder hold for a post, kept in step when the owner changes the post (SM-010).
         $this->app->bind(TargetCleanup::class, fn () => TargetCleanup::make());
+        // The publisher: built fresh each time, so a newly saved key or Hostinger folder is used straight away.
+        $this->app->bind(Publisher::class, fn () => Publisher::make());
     }
 
     /**

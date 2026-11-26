@@ -28,6 +28,8 @@ class DailyCommand extends Command
                 $this->line("Hostinger folder: removed {$removed} old file(s).");
             }
         });
+        // Posts that are due, handed to Facebook once inside its window, and the wake-up tasks (SM-010).
+        $this->job('Publisher', fn () => $this->call('smm:publish-due'));
         $this->job('Account check', fn () => $this->call('smm:check-accounts'));
         // New, changed and missing files in Markting Social Media (read only, SM-009).
         $this->job('Library scan', fn () => $this->call('smm:media:scan'));
