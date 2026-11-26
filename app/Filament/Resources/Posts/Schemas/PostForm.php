@@ -134,6 +134,8 @@ final class PostForm
                 ]),
             View::make('filament.posts.preview')
                 ->visible(fn (?Post $record): bool => $record !== null),
+            View::make('filament.posts.sending')
+                ->visible(fn (?Post $record): bool => $record !== null),
             View::make('filament.posts.history')
                 ->visible(fn (?Post $record): bool => $record !== null),
         ]);

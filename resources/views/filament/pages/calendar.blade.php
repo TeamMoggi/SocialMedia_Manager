@@ -10,6 +10,12 @@
                 {{ $state->label() }}
             </span>
         @endforeach
+        @foreach (['#2563eb' => 'Handed over or queued', '#d97706' => 'Late', '#dc2626' => 'Failed or missed'] as $colour => $label)
+            <span style="display:inline-flex;align-items:center;gap:.4rem">
+                <span style="width:.75rem;height:.75rem;border-radius:999px;background:{{ $colour }};display:inline-block"></span>
+                {{ $label }}
+            </span>
+        @endforeach
         <span style="opacity:.7">Times in {{ $zone }}. Drag a post to change its time; an approved post stays approved.</span>
     </div>
 
