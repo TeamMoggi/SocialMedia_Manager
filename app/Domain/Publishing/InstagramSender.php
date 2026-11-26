@@ -211,7 +211,7 @@ final class InstagramSender
                 throw new RuntimeException('Instagram could not prepare it: '.($status['status'] ?? $code));
             }
             if ($waited >= $limit) {
-                throw new RuntimeException('Instagram took over '.intdiv($limit, 60).' minute(s) to prepare it.');
+                throw new TemporaryFailure('Instagram took over '.intdiv($limit, 60).' minute(s) to prepare it.');
             }
             ($this->sleep)($every);
         }

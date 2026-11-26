@@ -52,8 +52,30 @@ final class TargetPlanner
         return $minutes === null ? null : $from->addMinutes((int) $minutes);
     }
 
+    /** The end of the catch-up days: the start of the day after day +3 (brand time zone). */
+    public function windowEnd(PostTarget $target): CarbonImmutable
+    {
+        return $this->dayStart($target, $target->post->scheduled_at)->addDays((int) config('smm.publishing.catch_up_days') + 1);
+    }
+
+    /** The start of the calendar day containing $time, in the brand's time zone. */
+    public function dayStart(PostTarget $target, CarbonImmutable $time): CarbonImmutable
+    {
+        $zone = $target->post->brand->timezone ?: (string) config('smm.display_timezone');
+
+        return $time->setTimezone($zone)->startOfDay();
+    }
+
     private function unsent(PostTarget $target, CarbonImmutable $now, CarbonImmutable $at, CarbonImmutable $onTimeEnd): Action
     {
+        // "Post now" from the Missed list: send at once, whatever the planned time was.
+        if (($target->work['post_now'] ?? false) === true) {
+            if ($target->network === Network::FacebookPage) {
+                return Action::PublishFacebookNow;
+            }
+
+            return $this->prepared($target) ? Action::PublishInstagram : Action::PrepareInstagram;
+        }
         if ($now->greaterThan($onTimeEnd)) {
             return Action::MarkLate;
         }
@@ -62,7 +84,7 @@ final class TargetPlanner
             return $this->facebook($now, $at);
         }
 
-        $prepared = filled($target->work['relay'] ?? null) || filled($target->container_id);
+        $prepared = $this->prepared($target);
         if ($now->greaterThanOrEqualTo($at)) {
             return $prepared ? Action::PublishInstagram : Action::PrepareInstagram;
         }
@@ -71,6 +93,11 @@ final class TargetPlanner
         }
 
         return Action::Nothing;
+    }
+
+    private function prepared(PostTarget $target): bool
+    {
+        return filled($target->work['relay'] ?? null) || filled($target->container_id);
     }
 
     private function facebook(CarbonImmutable $now, CarbonImmutable $at): Action
@@ -103,14 +130,13 @@ final class TargetPlanner
 
     private function late(PostTarget $target, CarbonImmutable $now): Action
     {
-        $zone = $target->post->brand->timezone ?: (string) config('smm.display_timezone');
-        // One try per calendar day in the brand's zone, starting the day after the planned day.
-        $gate = $target->next_attempt_at
-            ?? $target->post->scheduled_at->setTimezone($zone)->startOfDay()->addDay();
-        if ($now->lessThan($gate)) {
-            return Action::Nothing;
+        // The catch-up days are day +1 to day +3 after the planned day; after that the post is Missed.
+        if ($now->greaterThanOrEqualTo($this->windowEnd($target))) {
+            return Action::GiveUp;
         }
+        // One try per calendar day in the brand's zone, starting the day after the planned day.
+        $gate = $target->next_attempt_at ?? $this->dayStart($target, $target->post->scheduled_at)->addDay();
 
-        return $target->late_days >= (int) config('smm.publishing.catch_up_days') ? Action::GiveUp : Action::CatchUp;
+        return $now->lessThan($gate) ? Action::Nothing : Action::CatchUp;
     }
 }

@@ -182,4 +182,31 @@ class TargetPlannerTest extends TestCase
         $this->assertSame('06:10', $planner->nextRetryAt(3, $from)->format('H:i'));
         $this->assertNull($planner->nextRetryAt(4, $from));
     }
+
+    public function test_late_target_is_tried_on_the_first_day_the_laptop_is_on_inside_the_window(): void
+    {
+        $t = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Late]);
+
+        // Day +2 in India (laptop was off on day +1).
+        $this->assertSame(Action::CatchUp, $this->plan($t, '2026-12-06 05:00:00'));
+    }
+
+    public function test_late_target_is_given_up_when_the_three_days_are_over_even_without_attempts(): void
+    {
+        $t = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Late]);
+
+        // The window ends at the start of day +4 in India = 7 Dec 18:30 UTC.
+        $this->assertSame(Action::CatchUp, $this->plan($t, '2026-12-07 17:00:00'));
+        $this->assertSame(Action::GiveUp, $this->plan($t, '2026-12-07 18:30:00'));
+        $this->assertSame('2026-12-07 18:30:00', (new TargetPlanner)->windowEnd($t->fresh(['post.brand']))->utc()->format('Y-m-d H:i:s'));
+    }
+
+    public function test_post_now_ignores_the_time_and_the_on_time_window(): void
+    {
+        $facebook = $this->target(PostType::FacebookText, '2026-12-04 06:00:00', ['work' => ['post_now' => true]]);
+        $instagram = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['work' => ['post_now' => true]]);
+
+        $this->assertSame(Action::PublishFacebookNow, $this->plan($facebook, '2026-12-09 06:00:00'));
+        $this->assertSame(Action::PrepareInstagram, $this->plan($instagram, '2026-12-09 06:00:00'));
+    }
 }

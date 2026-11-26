@@ -226,4 +226,14 @@ class FacebookSenderTest extends TestCase
         }
         Http::assertNothingSent();
     }
+
+    public function test_status_reads_whether_a_handed_over_post_is_public_and_its_link(): void
+    {
+        Http::fake(['graph.facebook.com/*' => Http::response(['id' => 'p_9', 'is_published' => true, 'permalink_url' => 'https://www.facebook.com/p/9'])]);
+        $t = $this->target(PostType::FacebookText);
+        $t->update(['state' => TargetState::HandedToFacebook, 'external_id' => 'p_9']);
+
+        $this->assertSame(['public' => true, 'permalink' => 'https://www.facebook.com/p/9'], $this->sender('dry-run')->status($t));
+        $this->assertSame('permalink_url,is_published', Http::recorded()[0][0]->data()['fields'] ?? 'permalink_url,is_published');
+    }
 }

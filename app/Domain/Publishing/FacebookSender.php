@@ -54,6 +54,15 @@ final class FacebookSender
         $this->graph->post((string) $target->external_id, ['scheduled_publish_time' => $at->timestamp], $this->token($target));
     }
 
+    /** Reads whether a handed-over post is public yet (a read only; allowed in any mode). */
+    public function status(PostTarget $target): array
+    {
+        $video = $target->type === PostType::FacebookVideo;
+        $info = $this->graph->get((string) $target->external_id, ['fields' => $video ? 'permalink_url,published' : 'permalink_url,is_published'], $this->token($target));
+
+        return ['public' => (bool) ($info['is_published'] ?? $info['published'] ?? false), 'permalink' => $info['permalink_url'] ?? null];
+    }
+
     /** Deletes Facebook's scheduled copy (and its temporary photos) and puts the target back to "not sent yet". */
     public function withdraw(PostTarget $target): void
     {
