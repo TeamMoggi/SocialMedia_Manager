@@ -85,7 +85,8 @@ class LinkedInSettings extends Page
                 ->visible(fn (): bool => $this->account() !== null)
                 ->action(function (): void {
                     try {
-                        $problem = app(LinkedInConnector::class)->check($this->brand());
+                        // The same check and record as the daily job, so the page and the account agree.
+                        $problem = app(LinkedInConnector::class)->checkAndRecord($this->brand())['problem'];
                     } catch (LinkedInError $e) {
                         Notification::make()->title('Could not check now')->body($e->plain())->warning()->send();
 

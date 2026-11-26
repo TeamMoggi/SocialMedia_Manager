@@ -70,7 +70,7 @@ class CheckAccountsCommand extends Command
             ->each(function (ConnectedAccount $account) use ($linkedin): void {
                 $brand = $account->brand;
                 try {
-                    $problem = $linkedin->check($brand);
+                    ['problem' => $problem, 'newly_broken' => $newlyBroken] = $linkedin->checkAndRecord($brand);
                 } catch (LinkedInError $e) {
                     $this->line("LinkedIn key: could not check now ({$e->plain()}). Nothing changed.");
 
@@ -78,20 +78,10 @@ class CheckAccountsCommand extends Command
                 }
 
                 if ($problem === null) {
-                    if ($account->status === AccountStatus::Error && ($account->meta['error_from'] ?? null) === 'linkedin_key') {
-                        $account->update(['status' => AccountStatus::Connected, 'last_error' => null, 'meta' => Arr::except($account->meta ?? [], 'error_from')]);
-                    }
                     $this->line('LinkedIn key: works.');
 
                     return;
                 }
-
-                $newlyBroken = $account->status !== AccountStatus::Error;
-                $account->update([
-                    'status' => AccountStatus::Error,
-                    'last_error' => $problem,
-                    'meta' => ['error_from' => 'linkedin_key'] + ($account->meta ?? []),
-                ]);
                 $this->line("LinkedIn key: {$problem}");
 
                 if ($newlyBroken) {

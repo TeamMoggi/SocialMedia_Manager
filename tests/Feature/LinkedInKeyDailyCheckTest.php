@@ -112,6 +112,30 @@ class LinkedInKeyDailyCheckTest extends TestCase
         $this->assertSame([], $this->notificationTitles());
     }
 
+    public function test_forbidden_marks_error(): void
+    {
+        $account = $this->connected();
+        Http::fake(['api.linkedin.com/*' => Http::response(['status' => 403, 'message' => 'Not enough permissions'], 403)]);
+
+        $this->artisan('smm:check-accounts')->assertExitCode(0);
+
+        $this->assertSame(AccountStatus::Error, $account->fresh()->status);
+        $this->assertSame(['LinkedIn key stopped working'], $this->notificationTitles());
+    }
+
+    public function test_other_refusals_change_nothing(): void
+    {
+        $account = $this->connected();
+        foreach ([426, 400, 404] as $status) {
+            Http::fake(fn () => Http::response(['status' => $status, 'message' => 'x'], $status));
+
+            $this->artisan('smm:check-accounts')->expectsOutputToContain('LinkedIn key: could not check now')->assertExitCode(0);
+
+            $this->assertSame(AccountStatus::Connected, $account->fresh()->status, "status {$status}");
+        }
+        $this->assertSame([], $this->notificationTitles());
+    }
+
     public function test_expiry_warning_still_comes_from_account_health(): void
     {
         $account = $this->connected(['token_expires_at' => now()->addDays(5)]);

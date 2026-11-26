@@ -102,6 +102,25 @@ class LinkedInSettingsPageTest extends TestCase
         Livewire::test(LinkedInSettings::class)->callAction('checkNow')->assertNotified('LinkedIn key problem');
     }
 
+    public function test_check_now_records_the_result_like_the_daily_check(): void
+    {
+        LinkedInCredentials::saveApp('77qh6eszwh69s9', 'topsecret');
+        $account = $this->connected();
+        Http::fake(['api.linkedin.com/rest/organizationAcls*' => Http::sequence()
+            ->push(['status' => 401, 'message' => 'Invalid access token'], 401)
+            ->push(['elements' => [['role' => 'ADMINISTRATOR', 'state' => 'APPROVED', 'organization' => 'urn:li:organization:145339181']]])]);
+
+        Livewire::test(LinkedInSettings::class)->callAction('checkNow');
+        $account->refresh();
+        $this->assertSame(\App\Enums\AccountStatus::Error, $account->status);
+        $this->assertSame('linkedin_key', $account->meta['error_from']);
+
+        Livewire::test(LinkedInSettings::class)->callAction('checkNow')->assertNotified('LinkedIn key works');
+        $account->refresh();
+        $this->assertSame(\App\Enums\AccountStatus::Connected, $account->status);
+        $this->assertNull($account->last_error);
+    }
+
     public function test_check_now_hidden_until_connected(): void
     {
         Livewire::test(LinkedInSettings::class)->assertActionHidden('checkNow');

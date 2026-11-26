@@ -95,11 +95,13 @@ final class LinkedInConnector
      *
      * @return ?string null when it works; otherwise the problem for the owner.
      *
-     * @throws LinkedInError when LinkedIn could not be asked (no connection, its own trouble, daily limit).
+     * @throws LinkedInError when the answer says nothing about the key: no connection, LinkedIn's own
+     *                       trouble, its daily limit, or a reply that reconnecting cannot fix (a retired
+     *                       API version, a malformed request).
      */
     public function check(Brand $brand): ?string
     {
-        $account = ConnectedAccount::where('brand_id', $brand->id)->where('network', Network::LinkedInOrganization)->first();
+        $account = $this->account($brand);
         if ($account === null || ! $account->access_token) {
             return 'LinkedIn is not connected yet.';
         }
@@ -107,16 +109,56 @@ final class LinkedInConnector
         try {
             $administered = $this->api->adminOrganizations($account->access_token);
         } catch (LinkedInError $e) {
-            if ($e->transient()) {
-                throw $e;
+            // Only a refused key (401) or refused access (403) is about the connection; reconnecting fixes those.
+            if ($e->keyRefused() || $e->status() === 403) {
+                return $e->plain();
             }
-
-            return $e->plain();
+            throw $e;
         }
 
         return in_array($account->external_id, $administered, true)
             ? null
             : "The LinkedIn account that connected the app is no longer an Administrator of the page {$account->name}. Press Reconnect LinkedIn and sign in with the page's Administrator.";
+    }
+
+    /**
+     * Runs check() and records the answer on the brand's LinkedIn account, for the daily job and the
+     * page's "Check the key now" alike: a problem puts it in Error (error_from=linkedin_key); a working
+     * key clears only an error this check set.
+     *
+     * @return array{problem: ?string, newly_broken: bool}
+     *
+     * @throws LinkedInError as check() does; nothing is changed then.
+     */
+    public function checkAndRecord(Brand $brand): array
+    {
+        $problem = $this->check($brand);
+        $account = $this->account($brand);
+        if ($account === null) {
+            return ['problem' => $problem, 'newly_broken' => false];
+        }
+
+        if ($problem === null) {
+            if ($account->status === AccountStatus::Error && ($account->meta['error_from'] ?? null) === 'linkedin_key') {
+                $account->update(['status' => AccountStatus::Connected, 'last_error' => null, 'meta' => Arr::except($account->meta ?? [], 'error_from')]);
+            }
+
+            return ['problem' => null, 'newly_broken' => false];
+        }
+
+        $newlyBroken = $account->status !== AccountStatus::Error;
+        $account->update([
+            'status' => AccountStatus::Error,
+            'last_error' => $problem,
+            'meta' => ['error_from' => 'linkedin_key'] + ($account->meta ?? []),
+        ]);
+
+        return ['problem' => $problem, 'newly_broken' => $newlyBroken];
+    }
+
+    private function account(Brand $brand): ?ConnectedAccount
+    {
+        return ConnectedAccount::where('brand_id', $brand->id)->where('network', Network::LinkedInOrganization)->first();
     }
 
     private function unchanged(Brand $brand): string
