@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\LinkedIn\LinkedInApi;
 use App\Domain\Meta\MetaGraph;
 use App\Domain\Publishing\Publisher;
 use App\Domain\Publishing\TargetCleanup;
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Meta calls: built fresh each time, so a newly saved App Secret is used straight away.
         $this->app->bind(MetaGraph::class, fn () => MetaGraph::make());
+        // LinkedIn calls: built fresh too, so a newly saved Client Secret is used straight away.
+        $this->app->bind(LinkedInApi::class, fn () => LinkedInApi::make());
         // The Hostinger folder: null until the owner has saved its details.
         $this->app->bind(RelayFolder::class, fn () => RelayFolder::fromSettings());
         // What Facebook and the Hostinger folder hold for a post, kept in step when the owner changes the post (SM-010).

@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Domain\Accounts\AccountHealth;
+use App\Domain\LinkedIn\LinkedInConnector;
+use App\Domain\LinkedIn\LinkedInError;
 use App\Domain\Meta\MetaConnector;
 use App\Domain\Meta\MetaCredentials;
 use App\Enums\AccountStatus;
@@ -20,9 +22,10 @@ class CheckAccountsCommand extends Command
 
     protected $description = 'Update each connected account\'s status and warn before access expires';
 
-    public function handle(MetaConnector $meta): int
+    public function handle(MetaConnector $meta, LinkedInConnector $linkedin): int
     {
         $this->checkMetaKeys($meta);
+        $this->checkLinkedInKeys($linkedin);
 
         $now = CarbonImmutable::now();
         $warningDays = (int) config('smm.token_expiry_warning_days');
@@ -53,6 +56,42 @@ class CheckAccountsCommand extends Command
         $this->info("Accounts checked; {$changed} changed.");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Asks LinkedIn whether each connected brand's key still works for its page. A refused key or a
+     * page the member no longer administers puts the LinkedIn account in Error (one message); no
+     * connection, LinkedIn's own trouble or its daily limit changes nothing. Expiry warnings come from
+     * AccountHealth below, as for every account.
+     */
+    private function checkLinkedInKeys(LinkedInConnector $linkedin): void
+    {
+        ConnectedAccount::with('brand.users')->where('network', Network::LinkedInOrganization)->get()
+            ->each(function (ConnectedAccount $account) use ($linkedin): void {
+                $brand = $account->brand;
+                try {
+                    ['problem' => $problem, 'newly_broken' => $newlyBroken] = $linkedin->checkAndRecord($brand);
+                } catch (LinkedInError $e) {
+                    $this->line("LinkedIn key: could not check now ({$e->plain()}). Nothing changed.");
+
+                    return;
+                }
+
+                if ($problem === null) {
+                    $this->line('LinkedIn key: works.');
+
+                    return;
+                }
+                $this->line("LinkedIn key: {$problem}");
+
+                if ($newlyBroken) {
+                    Notification::make()
+                        ->title('LinkedIn key stopped working')
+                        ->body("{$problem} Until then nothing can be posted to LinkedIn for {$brand->name}.")
+                        ->danger()
+                        ->sendToDatabase($brand->users);
+                }
+            });
     }
 
     /**

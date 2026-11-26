@@ -17,6 +17,12 @@ class ServeCommand extends Command
 
     protected $description = 'Run the app until it has not been used for a while';
 
+    /** PHP's server logs every address; the LinkedIn sign-in code and state in it are hidden (SM-011). */
+    public static function redact(string $output): string
+    {
+        return (string) preg_replace('/([?&](?:code|state)=)[^&\s]+/', '$1[hidden]', $output);
+    }
+
     public function handle(): int
     {
         $port = (int) ($this->option('port') ?: config('smm.port'));
@@ -28,7 +34,7 @@ class ServeCommand extends Command
         $server = new Process([$php, '-S', "127.0.0.1:{$port}", $router], public_path(), null, null, null);
         $log = fopen(app('smm.data_dir').DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'server.log', 'ab');
         $server->start(function (string $type, string $output) use ($log): void {
-            fwrite($log, $output);
+            fwrite($log, self::redact($output));
         });
 
         IdleWatch::touch();

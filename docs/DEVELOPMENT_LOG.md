@@ -4,6 +4,39 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 
 ---
 
+## SM-011 — Connect the LinkedIn company page (26 Nov 2026)
+
+**Tracker:** #19 (connect the LinkedIn company page), after #10 (LinkedIn approved app 265142813 for the Community Management API, Development tier, on 25 Nov 2026). Design: `docs/superpowers/specs/2026-11-26-sm-011-linkedin-connect-design.md`. Plan: `docs/superpowers/plans/2026-11-26-sm-011-linkedin-connect.md`, both approved by you on 26 Nov 2026 (built Native). Built on its own branch from main, so the publisher work (SM-010) is untouched.
+
+**What changed**
+- **LinkedIn page** (left menu, after Meta): Client ID and Client Secret (**Save app details**), the connected page with its key's end date, **Connect LinkedIn** / **Reconnect LinkedIn** and **Check the key now**.
+- **Sign-in:** Connect moves the browser to `http://localhost:{port}` (8090 App, 8091 Dev; both addresses saved in LinkedIn's portal on 26 Nov), opens LinkedIn, and LinkedIn sends you back to `/linkedin/callback`. You end on the LinkedIn page at the usual `127.0.0.1` address with the result.
+  - A sign-in link works once, for 10 minutes. Cancel, a wrong account or a missing permission saves nothing, and a working connection stays as it was.
+  - The app connects only if the signed-in LinkedIn account is an **Administrator** of the brand's page (Moggies International = 145339181).
+- **Permissions asked:** `rw_organization_admin` (find and manage the page), `w_organization_social` (post as the page, next step), `r_organization_social` (read the page's posts back). No personal-profile permissions; comment permissions come with the comments inbox (#34).
+- **Key:** LinkedIn's keys last 60 days and our tier gets no renewal keys. The key is stored encrypted on the LinkedIn connected account with its end date; the usual warning comes 7 days before, then **Reconnect LinkedIn**.
+- **Daily check** (`smm:check-accounts`, 09:00): asks LinkedIn which pages the key administers. A refused key or a page no longer administered marks the account "Problem" with one bell message; no internet, LinkedIn's own trouble or its daily limit changes nothing.
+- **API version** `LinkedIn-Version: 202611` (newest on 26 Nov 2026; LinkedIn supports each version at least a year). Development tier allows 500 calls a day; connecting and the daily check use a few.
+- Only the page id, name, role and permissions are stored, no member data (LinkedIn's data rules).
+
+**Checks**
+- 54 new tests (client, credentials, connector, sign-in round trip, page, daily check, server-log redaction); full suite 306/306.
+- **Independent review of the whole branch** (a fresh reviewer, 26 Nov): no critical issues, 2 important ones, plus one minor one treated as important. All 3 are fixed, each with a test that failed first:
+  - the daily check now marks "Problem" only when LinkedIn refuses the key (401) or the page access (403); anything else is "could not check now";
+  - **Check the key now** records its result like the daily check;
+  - the sign-in code is hidden in `logs/server.log`.
+  - 6 small points are left for later (see the decisions file).
+- **Real sign-in, 26 Nov 2026, 11:55 India time**, in a separate test copy (`Dev-LinkedIn`, data `DevLinkedInData`, port 8091). You signed in as Moggies In and pressed Allow.
+  - Connected: Moggies International (145339181), role ADMINISTRATOR, key valid until 25 Jan 2027.
+  - LinkedIn granted exactly `r_organization_social`, `rw_organization_admin`, `w_organization_social`.
+  - `smm:check-accounts` printed "LinkedIn key: works." (version 202611 and LinkedIn's real `organizationAcls` reply work).
+  - The server log shows `/linkedin/callback` with no code. Nothing was posted (dry run).
+- Setting up a fresh copy: if packages are installed before `.data-dir` exists, run `php artisan filament:upgrade` afterwards, or the screens load without their styles.
+
+**Where:** branch `feat/sm-011-linkedin-connect`. Dev: built, reviewed, real sign-in done. App: not yet (after the merge you connect once more in App on 8090; each copy keeps its own key).
+
+---
+
 ## SM-010 — Automatic posting (26 Nov 2026)
 
 **Tracker:** #24 (publisher), and the start of #26 (pilot). Part 3 of the build. Design: `docs/superpowers/specs/2026-11-18-phase1-posting-design.md` §7. Plan: `docs/superpowers/plans/2026-11-26-sm-010-publisher.md` (approved by you on 26 Nov 2026; built Native). Decisions and deferred items: `docs/superpowers/plans/2026-11-26-sm-010-decisions.md`.
