@@ -18,7 +18,7 @@ Newest entry first. Ids SM-001, SM-002, ... Each entry says what changed, why, h
 - **Safety:** nothing is sent unless `Approval::stillApproved()` is true; Dev never calls Meta to publish or upload (the senders refuse unless the graph is live).
 - **For Claude:** see "For Claude: publishing commands" in the how-to guide.
 
-**How it was checked:** 331 tests green (planner, both senders, the publisher incl. the retry, late, missed and crash cases, approval hooks, wake times, pages, an end-to-end pass); `wake-at.ps1` made and removed a real task in Dev without a prompt; `smm:publish-due` ran in Dev against DevData (dry run). Not checked yet: a real post (needs the merge, the App update and you at the laptop), the Windows pop-up on screen, wake from sleep for a real post.
+**How it was checked:** an independent final review (opus) found 3 critical and 9 important problems (double posts after a lost connection, deleting an already-public Facebook post, stale copies); all fixed test-first. 354 tests green (planner, both senders, the publisher incl. the retry, late, missed and crash cases, approval hooks, wake times, pages, an end-to-end pass); `wake-at.ps1` made and removed a real task in Dev without a prompt; `smm:publish-due` ran in Dev against DevData (dry run). Not checked yet: a real post (needs the merge, the App update and you at the laptop), the Windows pop-up on screen, wake from sleep for a real post.
 
 **Where it stands:** Dev: built on `feat/sm-010-publisher`. App: not yet.
 

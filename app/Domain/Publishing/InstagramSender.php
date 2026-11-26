@@ -32,12 +32,20 @@ final class InstagramSender
 {
     private readonly Closure $sleep;
 
+    private ?Closure $gate = null;
+
     public function __construct(
         private readonly MetaGraph $graph,
         private readonly RelayFolder $relay,
         ?Closure $sleep = null,
     ) {
         $this->sleep = $sleep ?? fn (int $seconds) => sleep($seconds);
+    }
+
+    /** A check made right before the final publish: false cancels it (the approval changed meanwhile). */
+    public function setGate(?Closure $gate): void
+    {
+        $this->gate = $gate;
     }
 
     public function prepare(PostTarget $target): void
@@ -47,6 +55,14 @@ final class InstagramSender
         $account = TargetAccount::for($target);
         $token = (string) $account->access_token;
         $ig = $account->external_id;
+        // An earlier publish may have gone out even though its answer was lost: look before making anything new.
+        if (filled($target->work['publish_started_at'] ?? null) && blank($target->external_id)) {
+            $this->adoptOrFail($target, $ig, $token, CarbonImmutable::parse($target->work['publish_started_at']));
+
+            return;
+        }
+        // Files left by an interrupted earlier prepare go first.
+        $this->cleanRelay($target);
         $caption = CaptionBuilder::for($target);
         $ai = AiLabel::applies($target->post);
         $video = false;
@@ -55,7 +71,11 @@ final class InstagramSender
             $urls = [];
             foreach ($target->post->media as $media) {
                 /** @var PostMedia $media */
-                $file = $this->relay->put($media->fullPath());
+                try {
+                    $file = $this->relay->put($media->fullPath());
+                } catch (Throwable $e) {
+                    throw new TemporaryFailure('Could not reach the Hostinger folder: '.$e->getMessage());
+                }
                 $this->remember($target, 'relay', $file['name']);
                 $urls[] = [$file['url'], str_starts_with((string) $media->mime, 'video/')];
                 $video = $video || end($urls)[1];
@@ -109,9 +129,12 @@ final class InstagramSender
             return;
         }
         if (blank($target->container_id)) {
-            throw new RuntimeException('This post was not prepared on Instagram yet.');
+            throw new TemporaryFailure('This post was not prepared on Instagram yet.');
         }
 
+        if ($this->gate !== null && ! ($this->gate)($target)) {
+            throw new SendCancelled('The post changed while it was being prepared.');
+        }
         $work['publish_started_at'] = CarbonImmutable::now()->toIso8601String();
         $target->update(['work' => $work]);
         try {
@@ -151,17 +174,18 @@ final class InstagramSender
     {
         $this->cleanRelay($target);
         $work = $target->fresh()->work ?? [];
-        unset($work['children'], $work['publish_started_at']);
+        // publish_started_at stays: a post that may already be out must never be prepared and posted again.
+        unset($work['children']);
         $target->update(['state' => TargetState::Waiting, 'container_id' => null, 'work' => $work]);
     }
 
     private function adoptOrFail(PostTarget $target, string $ig, string $token, CarbonImmutable $started): void
     {
-        $expected = trim(CaptionBuilder::for($target));
+        $expected = self::normal(CaptionBuilder::for($target));
         $recent = $this->graph->get("{$ig}/media", ['fields' => 'id,timestamp,permalink,caption', 'limit' => 5], $token)['data'] ?? [];
         foreach ($recent as $media) {
             $posted = CarbonImmutable::parse((string) ($media['timestamp'] ?? '1970-01-01'));
-            if ($posted->greaterThanOrEqualTo($started->subSeconds(30)) && ($expected === '' || trim((string) ($media['caption'] ?? '')) === $expected)) {
+            if ($posted->greaterThanOrEqualTo($started->subSeconds(30)) && ($expected === '' || self::normal((string) ($media['caption'] ?? '')) === $expected)) {
                 $target->update(['external_id' => (string) $media['id']]);
                 $this->finish($target, (string) $media['id'], $media['permalink'] ?? null);
 
@@ -169,6 +193,12 @@ final class InstagramSender
             }
         }
         throw new RuntimeException('Instagram may have published this already: check Instagram before trying again.');
+    }
+
+    /** Text with Windows line endings and outer spaces removed, for comparing a typed caption with Instagram's copy. */
+    private static function normal(string $text): string
+    {
+        return trim(str_replace("\r\n", "\n", $text));
     }
 
     private function finish(PostTarget $target, string $mediaId, ?string $permalink): void

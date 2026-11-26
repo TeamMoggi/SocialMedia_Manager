@@ -48,6 +48,10 @@ class ServeCommand extends Command
             $last = @filemtime(IdleWatch::activityFile()) ?: time();
             if (IdleWatch::shouldStop($last, time(), $idle)) {
                 $this->info('Not used for '.$idle.' minutes: stopping.');
+                // A publish pass still working (for example a video being prepared) is allowed to finish.
+                if ($publisher !== null && $publisher->isRunning()) {
+                    $publisher->wait();
+                }
                 $server->stop(5);
                 break;
             }

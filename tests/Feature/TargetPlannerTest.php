@@ -74,7 +74,7 @@ class TargetPlannerTest extends TestCase
         $this->assertSame(Action::Nothing, $this->plan($t, '2026-12-04 05:44:00'));
         $this->assertSame(Action::PrepareInstagram, $this->plan($t, '2026-12-04 05:45:00'));
 
-        $prepared = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'work' => ['relay' => ['a.jpg']]]);
+        $prepared = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'container_id' => 'c1', 'work' => ['relay' => ['a.jpg']]]);
         $this->assertSame(Action::Nothing, $this->plan($prepared, '2026-12-04 05:50:00'));
     }
 
@@ -100,7 +100,7 @@ class TargetPlannerTest extends TestCase
 
     public function test_instagram_is_published_at_the_time_when_prepared_or_prepared_first_when_not(): void
     {
-        $prepared = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'work' => ['relay' => ['a.jpg']]]);
+        $prepared = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'container_id' => 'c1', 'work' => ['relay' => ['a.jpg']]]);
         $cold = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00');
 
         $this->assertSame(Action::PublishInstagram, $this->plan($prepared, '2026-12-04 06:00:00'));
@@ -140,7 +140,7 @@ class TargetPlannerTest extends TestCase
     public function test_a_target_still_unsent_after_the_on_time_window_goes_late(): void
     {
         $waiting = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00');
-        $queued = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'work' => ['relay' => ['a']]]);
+        $queued = $this->target(PostType::InstagramPhoto, '2026-12-04 06:00:00', ['state' => TargetState::Queued, 'container_id' => 'c1', 'work' => ['relay' => ['a']]]);
         $facebook = $this->target(PostType::FacebookText, '2026-12-04 06:00:00');
 
         foreach ([$waiting, $queued, $facebook] as $t) {

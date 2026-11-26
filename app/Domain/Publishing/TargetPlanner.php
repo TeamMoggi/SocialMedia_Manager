@@ -15,7 +15,7 @@ use Carbon\CarbonImmutable;
  * hand it to Facebook, prepare or publish Instagram, retry, go late, catch up the next day, or give up.
  * It never writes to the database or the network.
  */
-final class TargetPlanner
+class TargetPlanner
 {
     public function plan(PostTarget $target, CarbonImmutable $now): Action
     {
@@ -25,7 +25,9 @@ final class TargetPlanner
             return Action::Nothing;
         }
 
-        $onTimeEnd = $at->addMinutes((int) config('smm.publishing.on_time_minutes'));
+        // After "Post now" the on-time window runs from the moment the owner pressed it.
+        $base = filled($target->work['post_now_at'] ?? null) ? CarbonImmutable::parse($target->work['post_now_at']) : $at;
+        $onTimeEnd = $base->addMinutes((int) config('smm.publishing.on_time_minutes'));
 
         return match ($target->state) {
             TargetState::Published, TargetState::HandedToFacebook, TargetState::Missed => Action::Nothing,
@@ -97,7 +99,8 @@ final class TargetPlanner
 
     private function prepared(PostTarget $target): bool
     {
-        return filled($target->work['relay'] ?? null) || filled($target->container_id);
+        // Only a saved container counts: files in the folder without one are leftovers of an interrupted prepare.
+        return filled($target->container_id);
     }
 
     private function facebook(CarbonImmutable $now, CarbonImmutable $at): Action

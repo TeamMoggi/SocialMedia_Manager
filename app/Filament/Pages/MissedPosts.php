@@ -42,7 +42,7 @@ class MissedPosts extends Page implements HasTable
 
     public static function getNavigationBadge(): ?string
     {
-        $count = self::targets()->whereIn('state', [TargetState::Missed, TargetState::Late])->count();
+        $count = self::targets()->whereIn('state', [TargetState::Missed, TargetState::Late, TargetState::Failed])->count();
 
         return $count > 0 ? (string) $count : null;
     }

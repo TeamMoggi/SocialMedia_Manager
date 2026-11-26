@@ -26,9 +26,13 @@ final class WakeTasks
 
     private readonly bool $enabled;
 
-    public function __construct(?Closure $run = null, ?bool $enabled = null)
+    private readonly ?string $stateFile;
+
+    /** @param string|null $stateFile where the last synced times are remembered (default: only for the real script) */
+    public function __construct(?Closure $run = null, ?bool $enabled = null, ?string $stateFile = null)
     {
         $this->run = $run;
+        $this->stateFile = $stateFile ?? ($run === null ? app('smm.data_dir').DIRECTORY_SEPARATOR.'run'.DIRECTORY_SEPARATOR.'wake-times.hash' : null);
         $this->enabled = $enabled ?? (PHP_OS_FAMILY === 'Windows' && PublishGuard::allowsLive(base_path()) && ! app()->runningUnitTests());
     }
 
@@ -77,7 +81,16 @@ final class WakeTasks
         }
         try {
             $times = array_map(fn (CarbonImmutable $t): string => $t->toIso8601String(), $this->times($now));
+            // PowerShell and the task list are heavy on a small laptop: only run the script when the times changed.
+            $hash = hash('sha256', implode(',', $times));
+            if ($this->stateFile !== null && @file_get_contents($this->stateFile) === $hash) {
+                return;
+            }
             $this->run !== null ? ($this->run)($times) : $this->runScript($times);
+            if ($this->stateFile !== null) {
+                @mkdir(dirname($this->stateFile), 0777, true);
+                file_put_contents($this->stateFile, $hash);
+            }
         } catch (Throwable $e) {
             Log::warning('Wake-up tasks could not be updated: '.$e->getMessage());
         }

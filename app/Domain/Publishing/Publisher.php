@@ -38,7 +38,12 @@ final class Publisher
         private readonly Approval $approval,
         private readonly Notifier $notifier,
         private readonly bool $live,
-    ) {}
+    ) {
+        // Right before the final send of a long prepare: stop if the owner changed or withdrew the post meanwhile.
+        $gate = fn (PostTarget $t): bool => $this->approval->stillApproved($t->post->fresh());
+        $this->facebook?->setGate($gate);
+        $this->instagram?->setGate($gate);
+    }
 
     public static function make(): self
     {
@@ -58,7 +63,7 @@ final class Publisher
     /** @return array{done: int, failed: int, late: int, missed: int, locked: bool, lines: list<string>} */
     public function run(?CarbonImmutable $now = null): array
     {
-        $now ??= CarbonImmutable::now();
+        $fixed = $now;
         $stats = ['done' => 0, 'failed' => 0, 'late' => 0, 'missed' => 0, 'locked' => false, 'lines' => []];
         $lock = $this->lock();
         if ($lock === null) {
@@ -76,7 +81,8 @@ final class Publisher
                 ->sortBy(fn (PostTarget $t) => $t->post->scheduled_at->timestamp);
             foreach ($targets as $target) {
                 try {
-                    $this->process($target, $now, $stats);
+                    // A long prepare must not freeze the clock for the targets after it (unless a time was given).
+                    $this->process($target, $fixed ?? CarbonImmutable::now(), $stats);
                 } catch (Throwable $e) {
                     $stats['lines'][] = "Post {$target->post_id} ({$target->network->label()}): {$e->getMessage()}";
                 }
@@ -95,7 +101,9 @@ final class Publisher
         if ($target->post->state !== PostState::Approved) {
             throw new ApprovalRefused('Approve the post again first.');
         }
-        $this->reset($target, true);
+        if (! $this->reset($target, true)) {
+            return;
+        }
         Activity::record($target->post->brand, $target->post, 'post now chosen', ['network' => $target->network->value], $by);
     }
 
@@ -135,9 +143,17 @@ final class Publisher
             return;
         }
         if ($target->state === TargetState::HandedToFacebook) {
-            $this->confirmFacebook($target, $now, $stats);
+            if (! $this->facebookCopyMatches($target, $now)) {
+                // Facebook holds an old copy (taken back or moved just now): plan again from the new state.
+                $target->refresh()->load('post.brand', 'post.media');
+                if ($target->state === TargetState::HandedToFacebook) {
+                    return;
+                }
+            } else {
+                $this->confirmFacebook($target, $now, $stats);
 
-            return;
+                return;
+            }
         }
 
         for ($step = 0; $step < 2; $step++) {
@@ -201,12 +217,20 @@ final class Publisher
             $send();
         } catch (PublishBlocked) {
             return;
+        } catch (SendCancelled) {
+            $this->takeBack($target->refresh(), 'approval changed while sending');
+            $this->withdrawApproval($target);
+
+            return;
         } catch (Throwable $e) {
             $this->failure($target, $e, $now, $stats, $catchUp);
 
             return;
         }
         $target->refresh();
+        if ($target->state !== TargetState::Failed && ($target->attempts > 0 || $target->next_attempt_at !== null)) {
+            $target->update(['attempts' => 0, 'next_attempt_at' => null]);
+        }
         Activity::record($post->brand, $post, 'send step done', ['network' => $target->network->value, 'state' => $target->state->value], 'publisher');
         if ($target->state === TargetState::Published) {
             $stats['done']++;
@@ -260,7 +284,7 @@ final class Publisher
         Activity::record($post->brand, $post, 'send failed', ['network' => $target->network->value, 'error' => $text, 'transient' => $transient, 'catch_up' => $catchUp], 'publisher');
 
         if ($transient && $catchUp) {
-            $next = $this->planner->dayStart($target, $now)->addDay();
+            $next = $this->planner->dayStart($target, $now)->addDay()->utc();
             $target->update(['state' => TargetState::Late, 'last_error' => $text, 'next_attempt_at' => $next]);
             if ($next->greaterThanOrEqualTo($this->planner->windowEnd($target))) {
                 $this->giveUp($target, $stats);
@@ -270,10 +294,12 @@ final class Publisher
         }
         if ($transient) {
             $attempts = $target->attempts + 1;
-            $target->update([
-                'state' => TargetState::Failed, 'attempts' => $attempts, 'last_error' => $text,
-                'next_attempt_at' => $this->planner->nextRetryAt($attempts, $now),
-            ]);
+            $next = $this->planner->nextRetryAt($attempts, $now);
+            // Out of quick retries but the post time is still ahead: keep trying every 30 minutes, it is not late.
+            if ($next === null && $now->lessThan($post->scheduled_at)) {
+                $next = $now->addMinutes(30);
+            }
+            $target->update(['state' => TargetState::Failed, 'attempts' => $attempts, 'last_error' => $text, 'next_attempt_at' => $next]);
 
             return;
         }
@@ -294,7 +320,7 @@ final class Publisher
         $stats['late']++;
         Activity::record($post->brand, $post, 'not sent on time', ['network' => $target->network->value], 'publisher');
         if ($now->lessThan($this->planner->windowEnd($target))) {
-            $this->notifier->late($target, "{$target->network->label()}: the post was not sent on time. The app will try again tomorrow, for up to {$this->days()} days.");
+            $this->notifier->late($target, "{$target->network->label()}: the post was not sent on time. The app will try again from the next day, for up to {$this->days()} days.");
         }
     }
 
@@ -325,6 +351,12 @@ final class Publisher
         } catch (Throwable $e) {
             $error = $e instanceof MetaError ? $e->plain() : $e->getMessage();
         }
+        // Facebook could not be asked (no connection yet after waking, for example): the post is not failed, ask again next pass.
+        if ($error !== null) {
+            $target->update(['last_error' => "Could not check Facebook yet: {$error}"]);
+
+            return;
+        }
         $public = $info['public'];
         if ($public) {
             $target->update(['state' => TargetState::Published, 'permalink' => $info['permalink'], 'published_at' => $at, 'last_error' => null]);
@@ -337,11 +369,40 @@ final class Publisher
         if ($overdue) {
             $work = $target->work ?? [];
             $work['permanent'] = true;
-            $text = $error !== null ? "Facebook did not confirm the post: {$error}" : 'Facebook has not published the scheduled post an hour after its time: check the Page.';
+            $text = 'Facebook has not published the scheduled post an hour after its time: check the Page.';
             $target->update(['state' => TargetState::Failed, 'last_error' => $text, 'work' => $work]);
             $stats['failed']++;
             $this->notifier->failed($target, "Facebook: {$text}");
         }
+    }
+
+    /**
+     * Whether what Facebook holds still matches the approved post. A copy made from older content is taken back,
+     * one with an old time is moved; either way the old copy never publishes unnoticed.
+     */
+    private function facebookCopyMatches(PostTarget $target, CarbonImmutable $now): bool
+    {
+        $held = $target->work['fb_held'] ?? null;
+        if (! is_array($held) || $this->facebook === null) {
+            return true;
+        }
+        $post = $target->post;
+        if (($held['fingerprint'] ?? null) !== $this->approval->fingerprint($post)) {
+            $this->takeBack($target, 'what Facebook holds no longer matches the post');
+
+            return false;
+        }
+        if (($held['at'] ?? null) !== $post->scheduled_at->utc()->toIso8601String()) {
+            try {
+                $this->facebook->reschedule($target, $post->scheduled_at);
+            } catch (Throwable) {
+                $this->takeBack($target, 'the time on Facebook could not be moved');
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function takeBack(PostTarget $target, string $why): void
@@ -373,12 +434,26 @@ final class Publisher
         $this->notifier->failed($target, "{$target->network->label()}: the post was not sent because it changed or can no longer be sent. Approve it again.");
     }
 
-    private function reset(PostTarget $target, bool $postNow): void
+    /** @return bool false when the version turned out to be published already (nothing to resend) */
+    private function reset(PostTarget $target, bool $postNow): bool
     {
+        // A Facebook copy that is already public must not be posted again; a scheduled one is taken back first.
+        if ($target->network === Network::FacebookPage && filled($target->external_id) && $this->facebook !== null) {
+            try {
+                $this->facebook->withdraw($target);
+            } catch (Throwable $e) {
+                throw new ApprovalRefused('Facebook could not be checked just now: try again in a minute.');
+            }
+            if ($target->refresh()->state === TargetState::Published) {
+                return false;
+            }
+        }
         $work = $target->work ?? [];
-        unset($work['permanent'], $work['publish_started_at'], $work['post_now']);
+        // The owner has read the "check" message: the double-post guards are cleared on purpose.
+        unset($work['permanent'], $work['publish_started_at'], $work['fb_started_at'], $work['post_now'], $work['post_now_at'], $work['fb_held']);
         if ($postNow) {
             $work['post_now'] = true;
+            $work['post_now_at'] = CarbonImmutable::now()->toIso8601String();
         }
         $target->update([
             'state' => TargetState::Waiting, 'attempts' => 0, 'late_days' => 0, 'next_attempt_at' => null,
@@ -387,6 +462,8 @@ final class Publisher
         if ($target->network === Network::Instagram) {
             $this->instagram?->abandon($target);
         }
+
+        return true;
     }
 
     private function dryRun(PostTarget $target, CarbonImmutable $now, array &$stats): void

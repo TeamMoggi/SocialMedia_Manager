@@ -41,6 +41,10 @@ final class TargetCleanup
         try {
             if ($target->state === TargetState::HandedToFacebook && $this->live && $this->facebook !== null) {
                 $this->facebook->withdraw($target);
+                // Facebook had already published it: it stays, recorded as published.
+                if ($target->fresh()->state === TargetState::Published) {
+                    return;
+                }
             }
         } catch (Throwable) {
             $this->couldNotTakeBack($target);
@@ -51,7 +55,8 @@ final class TargetCleanup
             $this->instagram?->abandon($target);
         }
         $work = $target->fresh()->work ?? [];
-        unset($work['permanent'], $work['publish_started_at'], $work['post_now'], $work['fb_media'], $work['children']);
+        // The double-post guards (publish_started_at, fb_started_at) stay: only the owner's Post now / New time clears them.
+        unset($work['permanent'], $work['post_now'], $work['post_now_at'], $work['fb_media'], $work['children'], $work['fb_held']);
         $target->update([
             'state' => TargetState::Waiting, 'external_id' => null, 'container_id' => null, 'permalink' => null,
             'attempts' => 0, 'late_days' => 0, 'next_attempt_at' => null, 'last_error' => null, 'work' => $work,

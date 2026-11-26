@@ -34,6 +34,12 @@ class PublishEndToEndTest extends TestCase
 
     protected bool $seed = true;
 
+    protected function tearDown(): void
+    {
+        File::deleteDirectory(app('smm.data_dir').DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.'test-e2e');
+        parent::tearDown();
+    }
+
     public function test_one_pass_publishes_facebook_and_instagram_and_a_second_pass_does_nothing(): void
     {
         $brand = Brand::where('slug', 'moggies-international')->firstOrFail();

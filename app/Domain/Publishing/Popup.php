@@ -2,21 +2,23 @@
 
 namespace App\Domain\Publishing;
 
-use Symfony\Component\Process\Process;
 use Throwable;
 
 /** A Windows pop-up (toast) for the owner when a post is published, late, missed or failed. Windows only; never in tests. */
 final class Popup
 {
-    public static function show(string $title, string $text): void
+    /** @param string|null $script another script to run instead of notify.ps1 (for checks) */
+    public static function show(string $title, string $text, ?string $script = null): void
     {
-        if (PHP_OS_FAMILY !== 'Windows' || app()->runningUnitTests()) {
+        if (PHP_OS_FAMILY !== 'Windows' || (app()->runningUnitTests() && $script === null)) {
             return;
         }
         try {
-            $script = base_path('scripts'.DIRECTORY_SEPARATOR.'windows'.DIRECTORY_SEPARATOR.'notify.ps1');
-            $process = new Process(['powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', $script, '-Title', $title, '-Text', $text], base_path(), null, null, 30);
-            $process->start();
+            $script ??= base_path('scripts'.DIRECTORY_SEPARATOR.'windows'.DIRECTORY_SEPARATOR.'notify.ps1');
+            $clean = fn (string $value): string => str_replace(['"', '%', "\r", "\n"], ["'", '', ' ', ' '], $value);
+            // "start /B" lets PowerShell outlive this PHP process; a Symfony Process would be killed when it is destroyed.
+            $command = 'start "" /B powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "'.$script.'" -Title "'.$clean($title).'" -Text "'.$clean($text).'"';
+            pclose(popen($command, 'r'));
         } catch (Throwable) {
             // The in-app notice is enough if the pop-up cannot be shown.
         }
